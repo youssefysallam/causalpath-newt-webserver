@@ -115,6 +115,32 @@ function parseFormatStyles(formatText) {
     return out;
 }
 
+// pull the ".format" rppasite lines into infobox descriptors so the overlay can
+// draw the little "unit of information" circles each node carries, same as the
+// main canvas does (see sif-style-factory's rppasite handling). each descriptor:
+//   { selector:'all-nodes'|<name>, value, bgColor:'#rrggbb', borderColor, tooltip }
+// mirrors parseFormatStyles above but for the infobox side it deliberately skips.
+function parseInfoboxes(formatText) {
+    var out = [];
+    (formatText || '').split(/\r?\n/).forEach(function (line) {
+        if (!line.trim()) return;
+        var cols = line.split('\t');
+        if (cols.length < 4) return;
+        if (cols[0] !== 'node' || cols[2] !== 'rppasite') return;
+        // featureVal is "siteName|value|bg r g b|border r g b|tooltipSuffix"
+        var parts = cols[3].split('|');
+        if (parts.length < 5) return;
+        out.push({
+            selector: cols[1],
+            value: parts[1],
+            bgColor: rgbToHex(parts[2]),
+            borderColor: rgbToHex(parts[3]),
+            tooltip: parts[0] + ', ' + parts[4],
+        });
+    });
+    return out;
+}
+
 module.exports = {
     splitSifLine: splitSifLine,
     splitPastedGenes: splitPastedGenes,
@@ -123,4 +149,5 @@ module.exports = {
     filterSif: filterSif,
     rgbToHex: rgbToHex,
     parseFormatStyles: parseFormatStyles,
+    parseInfoboxes: parseInfoboxes,
 };

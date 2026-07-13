@@ -158,6 +158,30 @@ function applyColors(cy, formatText) {
     });
 }
 
+// draw the little "unit of information" circles from the .format rppasite lines,
+// the same badges the main canvas shows. sifStyle can't be reused here because it
+// drives chise's undoRedo actions, which aren't registered on the overlay's
+// undoable:false instance — so we call the public infobox methods directly (they
+// have a non-undoable branch that hits elementUtilities synchronously). because
+// each add lands immediately, statesandinfos.length gives the next index each time.
+function applyInfoboxes(cy, instance, formatText) {
+    var boxes = subgraphUtils.parseInfoboxes(formatText);
+    if (!boxes.length) return;
+    boxes.forEach(function (b) {
+        var eles = b.selector === 'all-nodes'
+            ? cy.nodes()
+            : cy.nodes().filter('[label="' + b.selector + '"]');
+        eles.forEach(function (ele) {
+            var index = ele.data('statesandinfos').length;
+            instance.addStateOrInfoBox(ele, {clazz: 'unit of information', label: {text: ''}});
+            instance.updateInfoboxStyle(ele, index,
+                {'border-color': b.borderColor, 'background-color': b.bgColor});
+            instance.updateInfoboxObj(ele, index, {tooltip: b.tooltip});
+            instance.changeStateOrInfoBox(ele, index, b.value, 'unit of information');
+        });
+    });
+}
+
 // group nodes with identical topology into compound boxes, the same way the main
 // canvas does (chise's sifTopologyGrouping). needs expand-collapse initialized on
 // the cy (done in open) so its lock/unlock cue calls are safe. best-effort: if it
@@ -208,6 +232,7 @@ function open(subSif, fileName, genes, formatText) {
     instance.loadSIFFile(file, function () {
         applyGrouping(instance);
         applyColors(cy, formatText);
+        applyInfoboxes(cy, instance, formatText);
         cy.one('layoutstop', function () {
             cy.resize();
             cy.fit(cy.elements(':visible'), 20);

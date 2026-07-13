@@ -7,6 +7,7 @@ const {
     filterSif,
     rgbToHex,
     parseFormatStyles,
+    parseInfoboxes,
 } = require('../public/javascript/newt/subgraph-utils');
 
 const SIF = [
@@ -90,4 +91,19 @@ test('parseFormatStyles maps color/border directives and skips rppasite/tooltip'
     ]);
     assert.deepStrictEqual(parseFormatStyles(''), []);
     assert.deepStrictEqual(parseFormatStyles(null), []);
+});
+
+test('parseInfoboxes pulls rppasite lines into infobox descriptors', () => {
+    const format = [
+        'node\tall-nodes\tcolor\t255 255 255',                             // not rppasite
+        'node\tSF3B1\trppasite\tSF3B1_T211_P|p|255 82 42|50 50 50|14.8',
+        'node\tCDK1\trppasite\tCDK1_Y15|p|255 0 0|0 128 0|9.2',
+        'node\tCIP2A\ttooltip\tsome text',                                 // not rppasite
+    ].join('\n');
+    assert.deepStrictEqual(parseInfoboxes(format), [
+        {selector: 'SF3B1', value: 'p', bgColor: '#ff522a', borderColor: '#323232', tooltip: 'SF3B1_T211_P, 14.8'},
+        {selector: 'CDK1', value: 'p', bgColor: '#ff0000', borderColor: '#008000', tooltip: 'CDK1_Y15, 9.2'},
+    ]);
+    assert.deepStrictEqual(parseInfoboxes(''), []);
+    assert.deepStrictEqual(parseInfoboxes(null), []);
 });
