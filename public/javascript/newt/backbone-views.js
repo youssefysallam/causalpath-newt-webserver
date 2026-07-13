@@ -12,6 +12,7 @@ const colorPickerUtils = require('./color-picker-utils');
 var subgraphUtils = require('./subgraph-utils');
 var subgraphPreview = require('./subgraph-preview');
 var mainCanvasLoad = require('./main-canvas-load');
+var subgraphIndicator = require('./subgraph-indicator');
 //var annotationsHandler = require('./annotations-handler');
 
 // since biogene service from PC is not available any more, we now give link to gene properties in My Cancer Genome organization
@@ -6577,6 +6578,16 @@ var LoadSubgraphView = Backbone.View.extend({
         if (this.mode === 'canvas') {
             // load onto the main canvas with proper colors + grouping
             mainCanvasLoad.loadStyledSifToCanvas(subSif, this.format, this.fileName);
+            // show/refresh the selected-genes badge above the file tree. with no
+            // genes picked this is the full graph, so clear any stale badge.
+            if (valid.length) {
+                subgraphIndicator.show({
+                    fullSif: this.sifText, format: this.format,
+                    fileName: this.fileName, seeds: valid,
+                });
+            } else {
+                subgraphIndicator.hide();
+            }
         } else {
             // render in the floating preview panel (format drives node colors)
             subgraphPreview.open(subSif, this.fileName, valid, this.format);

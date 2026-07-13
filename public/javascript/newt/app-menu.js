@@ -8,6 +8,7 @@ const inspectorUtilities = require('./inspector-utilities');
 const tutorial = require('./tutorial');
 const sifStyleFactory = require('./sif-style-factory');
 const mainCanvasLoad = require('./main-canvas-load');
+const subgraphIndicator = require('./subgraph-indicator');
 const _ = require('underscore');
 const {Notyf} = require("notyf");
 
@@ -376,6 +377,7 @@ module.exports = function () {
         });
 
         $('#new-file, #new-file-icon').click(function () {
+            subgraphIndicator.hide();
             appUtilities.createNewNetwork();
         });
         // close the active file
@@ -398,6 +400,9 @@ module.exports = function () {
         });
 
         $('#file-input').change(function (e, fileObject) {
+            // opening a file replaces the graph -> drop any subgraph badge
+            subgraphIndicator.hide();
+
             // use the active chise instance
             var chiseInstance = appUtilities.getActiveChiseInstance();
 
@@ -633,6 +638,9 @@ module.exports = function () {
 
         // TODO: eliminate code replication in similar functions.
         $('#sif-file-input').change(function () {
+            // opening a sif replaces the graph -> drop any subgraph badge
+            subgraphIndicator.hide();
+
             const chiseInstance = appUtilities.getActiveChiseInstance();
             console.log(`chiseInstance:  ${chiseInstance}`);
 
@@ -2002,6 +2010,9 @@ module.exports = function () {
 
             let file = node.data;
 
+            // dbl-clicking loads a different full graph -> drop any subgraph badge
+            subgraphIndicator.hide();
+
             // load sif file
             const chiseInstance = appUtilities.getActiveChiseInstance();
             const cy = appUtilities.getActiveCy();
@@ -2288,6 +2299,8 @@ module.exports = function () {
         // canvas with colors + grouping, same result as double-clicking the file
         window.newtOpenFile = function (node, formatNode) {
             var fileName = nodeFileName(node);
+            // opening a file loads the full graph -> drop any subgraph badge
+            subgraphIndicator.hide();
             readSifAndFormatForNode(node, formatNode).then(function (r) {
                 mainCanvasLoad.loadStyledSifToCanvas(r.sif, r.format, fileName, function () {
                     promptInvalidFileView.render();
@@ -2305,6 +2318,9 @@ module.exports = function () {
         // clear graph: Setting the graph to empty file
         document.getElementById("back_button_label").addEventListener("click", function (e) {
             let chiseInstance = appUtilities.getActiveChiseInstance();
+
+            // clearing the graph -> drop any subgraph badge
+            subgraphIndicator.hide();
 
             let fileContent = "";
             let parts = [

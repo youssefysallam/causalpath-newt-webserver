@@ -141,6 +141,13 @@ function parseInfoboxes(formatText) {
     return out;
 }
 
+// drop one seed gene from a seed list, returning a new array (original untouched)
+function removeSeed(seeds, name) {
+    return (seeds || []).filter(function (g) {
+        return g !== name;
+    });
+}
+
 module.exports = {
     splitSifLine: splitSifLine,
     splitPastedGenes: splitPastedGenes,
@@ -150,4 +157,5 @@ module.exports = {
     rgbToHex: rgbToHex,
     parseFormatStyles: parseFormatStyles,
     parseInfoboxes: parseInfoboxes,
+    removeSeed: removeSeed,
 };

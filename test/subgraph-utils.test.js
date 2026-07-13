@@ -8,6 +8,7 @@ const {
     rgbToHex,
     parseFormatStyles,
     parseInfoboxes,
+    removeSeed,
 } = require('../public/javascript/newt/subgraph-utils');
 
 const SIF = [
@@ -106,4 +107,13 @@ test('parseInfoboxes pulls rppasite lines into infobox descriptors', () => {
     ]);
     assert.deepStrictEqual(parseInfoboxes(''), []);
     assert.deepStrictEqual(parseInfoboxes(null), []);
+});
+
+test('removeSeed returns a new array without the named seed, order preserved', () => {
+    const seeds = ['TP53', 'CDK1', 'AURKA'];
+    assert.deepStrictEqual(removeSeed(seeds, 'CDK1'), ['TP53', 'AURKA']);
+    assert.deepStrictEqual(seeds, ['TP53', 'CDK1', 'AURKA']); // original untouched
+    assert.deepStrictEqual(removeSeed(seeds, 'NOPE'), ['TP53', 'CDK1', 'AURKA']);
+    assert.deepStrictEqual(removeSeed(['ONLY'], 'ONLY'), []);
+    assert.deepStrictEqual(removeSeed(null, 'X'), []);
 });
