@@ -11,9 +11,11 @@ var mainCanvasLoad = require('./main-canvas-load');
 var CONTAINER_ID = 'subgraph-indicator-container';
 var STYLE_ID = 'subgraph-indicator-styles';
 
-// null when inactive, else { fullSif, format, fileName, seeds:[] }
+// null when inactive, else { fullSif, format, fileName, seeds:[], geneSet }
 var state = null;
 var expanded = false;
+var note = ''; // transient message shown under the add-genes input
+var focusInput = false; // refocus the add-genes input after the next render
 
 // scoped styles, injected once (no css build, same trick as subgraph-preview)
 function injectStyles() {
@@ -34,6 +36,13 @@ function injectStyles() {
         '.subgraph-indicator-chip-x:hover{color:#d33;}',
         '.subgraph-indicator-full{display:inline-block;margin-top:4px;color:#2a6ebb;',
         'cursor:pointer;text-decoration:underline;}',
+        '.subgraph-indicator-add-row{display:flex;gap:4px;margin-top:4px;}',
+        '.subgraph-indicator-input{flex:1 1 auto;min-width:0;border:1px solid #b9c6d6;',
+        'border-radius:3px;padding:2px 6px;font-size:12px;}',
+        '.subgraph-indicator-add{flex:0 0 auto;border:1px solid #2a6ebb;background:#2a6ebb;',
+        'color:#fff;border-radius:3px;padding:2px 8px;cursor:pointer;font-size:12px;}',
+        '.subgraph-indicator-add:hover{background:#215aa0;}',
+        '.subgraph-indicator-note{margin-top:3px;color:#c0392b;min-height:0;}',
     ].join('');
     var style = document.createElement('style');
     style.id = STYLE_ID;
@@ -64,11 +73,22 @@ function render() {
                 '" title="Remove">&times;</span></span>';
         }).join('');
         html += '<div class="subgraph-indicator-body">' + chips +
+            '<div class="subgraph-indicator-add-row">' +
+            '<input type="text" class="subgraph-indicator-input" placeholder="add gene(s)…">' +
+            '<button type="button" class="subgraph-indicator-add">Add</button>' +
+            '</div>' +
+            '<div class="subgraph-indicator-note">' + _escape(note) + '</div>' +
             '<div><span class="subgraph-indicator-full">Show full graph</span></div>' +
             '</div>';
     }
     html += '</div>';
     $c.html(html);
+    // keep focus in the input across the re-render so the user can keep typing
+    if (expanded && focusInput) {
+        var el = $c.find('.subgraph-indicator-input')[0];
+        if (el) el.focus();
+    }
+    focusInput = false;
 }
 
 // minimal html escaper (gene names are simple, but stay safe)
@@ -104,6 +124,30 @@ function removeGene(name) {
     }
 }
 
+// add one or more typed gene names to the seeds. only genes present in the full
+// graph count; anything else is reported in the note. re-filters if we added any.
+function addFromText(text) {
+    if (!state) return;
+    var tokens = subgraphUtils.splitPastedGenes(text);
+    var added = [];
+    var unknown = [];
+    tokens.forEach(function (name) {
+        if (!state.geneSet.has(name)) {
+            if (unknown.indexOf(name) === -1) unknown.push(name);
+        } else if (state.seeds.indexOf(name) === -1) {
+            state.seeds.push(name);
+            added.push(name);
+        }
+    });
+    note = unknown.length ? ('not in graph: ' + unknown.join(', ')) : '';
+    focusInput = true;
+    if (added.length) {
+        reFilter(); // recompute + render
+    } else {
+        render(); // nothing added, just surface the note
+    }
+}
+
 // delegated click handlers, bound once against the container
 function wireEvents() {
     var $c = $container();
@@ -111,6 +155,7 @@ function wireEvents() {
     $c.data('wired', true);
     $c.on('click', '.subgraph-indicator-bar', function () {
         expanded = !expanded;
+        note = '';
         render();
     });
     $c.on('click', '.subgraph-indicator-chip-x', function (e) {
@@ -120,6 +165,18 @@ function wireEvents() {
     $c.on('click', '.subgraph-indicator-full', function (e) {
         e.stopPropagation();
         showFull();
+    });
+    // add genes: click the button or press Enter in the input
+    $c.on('click', '.subgraph-indicator-add', function (e) {
+        e.stopPropagation();
+        var $input = $c.find('.subgraph-indicator-input');
+        addFromText($input.val());
+    });
+    $c.on('keydown', '.subgraph-indicator-input', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addFromText(this.value);
+        }
     });
 }
 
@@ -131,13 +188,17 @@ function show(opts) {
         return;
     }
     injectStyles();
+    var fullSif = opts.fullSif || '';
     state = {
-        fullSif: opts.fullSif || '',
+        fullSif: fullSif,
         format: opts.format || '',
         fileName: opts.fileName || '',
         seeds: opts.seeds.slice(),
+        // gene names present in the full graph, for validating typed additions
+        geneSet: new Set(subgraphUtils.parseSifGenes(fullSif).genes),
     };
     expanded = false;
+    note = '';
     wireEvents();
     render();
 }
@@ -145,6 +206,7 @@ function show(opts) {
 function hide() {
     state = null;
     expanded = false;
+    note = '';
     $container().empty();
 }
 
