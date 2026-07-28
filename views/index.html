@@ -17,162 +17,209 @@
     <!--  Notification Alert  -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 
+    <!--  File tree (moved up from the bottom of <body> so the theme below can override it)  -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.8/themes/default/style.min.css"/>
+
+    <!--  CausalPath theme. MUST stay last: it only overrides newt/bootstrap rules,  -->
+    <!--  so load order is what makes it win. see causalpath-theme.css.              -->
+    <link rel="stylesheet" href="../stylesheets/causalpath-theme.css">
+
 </head>
 
-<body>
+<body class="cp-theme">
 
 
-<div class="title-heading container-fluid">
-    <div class="row">
-        <div class="col-lg-0 col-md-0 col-sm-0 col-xs-0"></div>
+<!-- ===================== LANDING: guided "Start an analysis" ===================== -->
 
-        <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11" style="position: relative">
-            <img src="/img/logo.png" class="cp-logo" alt="CausalPath Logo">
-            <div style="display: inline; position: absolute; margin: 0;">
-                <h1 class="main-heading">CausalPath</h1>
-                <h3 class="sub-heading">causal interactions from molecular profiles</h3>
-            </div>
-
-        </div>
-
-        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
-
-    </div>
+<div class="cp-nav">
+    <img src="/img/logo.png" class="cp-nav-logo" alt="CausalPath logo">
+    <div class="cp-nav-title">CausalPath</div>
+    <div class="cp-rule"></div>
+    <div class="cp-nav-tagline">causal interactions from molecular profiles</div>
+    <div class="cp-spacer"></div>
+    <a class="cp-nav-link" href="https://github.com/PathwayAndDataAnalysis/causalpath" target="_blank"
+       rel="noopener">Docs</a>
+    <button type="button" class="cp-btn" id="cp-nav-load">Load data</button>
 </div>
 
+<div id="menu-text-buttons" class="body-content">
+    <div class="cp-landing">
 
-<div id="menu-text-buttons" class="body-content container-fluid">
-    <div class="row">
-        <div class="col-lg-0 col-md-0 col-sm-0 col-xs-0"></div>
-
-        <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
-
-            <div id="body_text" class="row" style="margin-top:40px;">
-
-                <p class="body-paragraph">
+        <div class="cp-hero">
+            <div>
+                <div class="cp-pill">GUIDED SETUP</div>
+                <h1 class="cp-h1">Causal interactions from molecular profiles</h1>
+                <p class="cp-lede">
                     CausalPath works on a set of molecular profiles and predicts the causal mechanisms that act on the
                     data. It integrates prior knowledge from biological pathway databases, and uses them to explain new
                     observations. While the main focus is phosphoproteomics, CausalPath can also work on global
                     proteomic, transcriptomic, acetylomic and methylomic profiles, and combinations of them.
                 </p>
-
-                <div class="container-fluid" style="margin-top: 60px">
-                    <img src="/img/causalpath-insights.png" alt="Causalpath mechanism">
+                <div class="cp-card cp-figure">
+                    <img src="/img/causalpath-insights.png" alt="How CausalPath turns molecular profiles into causal networks">
                 </div>
-
             </div>
 
-            <div id="selection_menus" class="row" style="margin-top: 70px;">
-                <div class="menu-buttons" style="padding-bottom:25px">
-                    <input type="file" id="file-analysis-input" class="file-picker"
-                           accept=".rar, .zip, .tar.xz, .7z, .tar.gz" single>
-                    <h3>> Load input files for analysis</h3>
-                    <p class="menu-hint-text">Please prepare your input files following
-                        <u><a href="https://github.com/PathwayAndDataAnalysis/causalpath/blob/master/wiki/InputFormat.md"
-                              style="position: absolute">this
-                            guide</a></u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;,
-                        and bundle them in a
-                        zip file without a folder structure. A sample input is available&nbsp;<u><a
-                                href="https://github.com/PathwayAndDataAnalysis/causalpath/raw/master/wiki/sample-data-and-parameters.zip"
-                                style="position: absolute">here.</a></u>
+            <div class="cp-card cp-setup">
+                <div class="cp-setup-head">
+                    <h2 class="cp-setup-title">Start an analysis</h2>
+                    <div class="cp-stepper" aria-hidden="true">
+                        <span class="cp-step is-done"><span class="cp-step-num">1</span>Source</span>
+                        <span class="cp-step-sep">&rsaquo;</span>
+                        <span class="cp-step is-current"><span class="cp-step-num">2</span>Data</span>
+                        <span class="cp-step-sep">&rsaquo;</span>
+                        <span class="cp-step"><span class="cp-step-num">3</span>Run</span>
+                    </div>
+                </div>
+
+                <div class="cp-seg" role="tablist" aria-label="Analysis source">
+                    <button type="button" class="cp-seg-item is-active" role="tab" aria-selected="true"
+                            data-cp-mode="new">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 16V4M7 9l5-5 5 5"/>
+                            <path d="M5 20h14"/>
+                        </svg>
+                        New analysis
+                    </button>
+                    <button type="button" class="cp-seg-item" role="tab" aria-selected="false" data-cp-mode="open">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        </svg>
+                        Open results
+                    </button>
+                    <button type="button" class="cp-seg-item" role="tab" aria-selected="false" data-cp-mode="demo">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="6" cy="6" r="2.2"/>
+                            <circle cx="18" cy="8" r="2.2"/>
+                            <circle cx="11" cy="18" r="2.2"/>
+                            <path d="M7.7 7.3l2 9M8 6.5l7.8 1.3"/>
+                        </svg>
+                        Demo graphs
+                    </button>
+                </div>
+
+                <!-- New analysis -->
+                <div class="cp-mode" data-cp-panel="new">
+                    <h3 class="cp-mode-title">Load input files for analysis</h3>
+                    <p class="cp-mode-help">Please prepare your input files following
+                        <a href="https://github.com/PathwayAndDataAnalysis/causalpath/blob/master/wiki/InputFormat.md"
+                           target="_blank" rel="noopener">this guide</a>, and bundle them in a zip file without a folder
+                        structure. A sample input is available
+                        <a href="https://github.com/PathwayAndDataAnalysis/causalpath/raw/master/wiki/sample-data-and-parameters.zip"
+                           target="_blank" rel="noopener">here.</a>
                     </p>
+                    <div class="cp-drop">
+                        <input type="file" id="file-analysis-input" class="file-picker"
+                               accept=".rar, .zip, .tar.xz, .7z, .tar.gz" single>
+                        <div class="cp-drop-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 16V4M7 9l5-5 5 5"/>
+                                <path d="M5 20h14"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="cp-drop-title">Drag &amp; drop your input <b>.zip</b></div>
+                            <div class="cp-drop-sub">or click to browse files</div>
+                        </div>
+                        <span class="cp-drop-chip">.zip · no folder structure</span>
+                    </div>
+                    <button type="button" class="cp-btn cp-btn-block" data-cp-picks="file-analysis-input">
+                        Continue to analysis
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14M13 6l6 6-6 6"/>
+                        </svg>
+                    </button>
                 </div>
 
-                <div class="menu-buttons">
-                    <input type="file" id="picker" class="file-picker" name="fileList" webkitdirectory multiple>
-                    <h3>> View results from a previous analysis</h3>
-                    <p class="menu-hint-text">Select the root folder of your analysis results to upload.</p>
+                <!-- Open results -->
+                <div class="cp-mode" data-cp-panel="open" hidden>
+                    <h3 class="cp-mode-title">View results from a previous analysis</h3>
+                    <p class="cp-mode-help">Select the root folder of your analysis results to upload.</p>
+                    <div class="cp-drop">
+                        <input type="file" id="picker" class="file-picker" name="fileList" webkitdirectory multiple>
+                        <div class="cp-drop-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="cp-drop-title">Select the results root folder</div>
+                            <div class="cp-drop-sub">click to choose a folder to upload</div>
+                        </div>
+                    </div>
+                    <button type="button" class="cp-btn cp-btn-block" data-cp-picks="picker">
+                        Open results
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14M13 6l6 6-6 6"/>
+                        </svg>
+                    </button>
                 </div>
 
-                <div id="display-demo-graphs" class="menu-buttons">
-                    <h3>> Display demo graphs</h3>
-                    <p class="menu-hint-text">View a collection of network results from previous studies.</p>
+                <!-- Demo graphs -->
+                <div class="cp-mode" data-cp-panel="demo" hidden>
+                    <h3 class="cp-mode-title">Display demo graphs</h3>
+                    <p class="cp-mode-help">View a collection of network results from previous studies.</p>
+                    <div class="cp-demo-grid" id="cp-demo-grid"></div>
+                    <!-- the real entry point; index.js binds its click handler, the chips above proxy to it -->
+                    <div id="display-demo-graphs" hidden></div>
                 </div>
             </div>
-
-
-            <div id="citation-section" style="margin-top: 80px;">
-                <p style="font-size: 17px;">CausalPath is described in detail in the following publications.</p>
-
-                <p style="margin-left: 20px">Babur, Ö., et al. (2021). <a
-                        href="https://www.sciencedirect.com/science/article/pii/S2666389921000830?via%3Dihub"><u>Causal
-                    interactions from proteomic
-                    profiles:
-                    Molecular data meet pathway knowledge.</u></a> Patterns, 2(6), 100257.
-                </p>
-
-                <p style="margin-left: 20px">Luna, A., et al. (2021). <a
-                        href="https://www.sciencedirect.com/science/article/pii/S2666166721006614"><u>Analyzing causal
-                    relationships in
-                    proteomic
-                    profiles using CausalPath.</u></a> STAR protocols, 2(4), 100955.
-                </p>
-
-                <p style="font-size: 16px;">
-                    <u>
-                        <a href="https://github.com/PathwayAndDataAnalysis/causalpath">
-                            Source code
-                        </a>
-                    </u>
-                    is also available!
-                </p>
-            </div>
-
-
-            <div id="collaboration-section" style="margin-top: 60px;">
-                <p style="font-size: 16px;">This is a collaborative project with contributions from the below
-                    institutions.</p>
-
-                <a href="https://www.umb.edu/">
-                    <img src="/img/umass-boston.png"
-                         class="collaboration-logo"
-                         style="margin-left: 1px"
-                         alt="University of Massachusetts Boston">
-
-                </a>
-
-                <a href="https://www.ohsu.edu/">
-                    <img src="/img/ohsu.png"
-                         class="collaboration-logo"
-                         alt="OHSU">
-                </a>
-
-                <a href="https://w3.bilkent.edu.tr/bilkent/">
-                    <img src="/img/bilkent-uni.png"
-                         class="collaboration-logo"
-                         alt="Bilkent University">
-                </a>
-
-                <a href="https://www.dana-farber.org/">
-                    <img src="/img/dana-farber-cancer.png"
-                         class="collaboration-logo"
-                         alt="Dana-Farber Cancer Institute">
-                </a>
-
-                <a href="https://www.mdanderson.org/">
-                    <img src="/img/md-anderson.png"
-                         class="collaboration-logo"
-                         alt="MD Anderson Cancer Center">
-                </a>
-
-                <a href="https://www.broadinstitute.org/">
-                    <img src="/img/broad-institute.png"
-                         class="collaboration-logo"
-                         alt="Broad Institute">
-                </a>
-            </div>
-
-
-            <div id="reach-out-section" style="margin-top: 60px;">
-                <p>Please reach out to <u><a href="mailto:causalpath@cs.umb.edu">causalpath@cs.umb.edu</a></u> for
-                    questions
-                    and
-                    comments.</p>
-            </div>
-
         </div>
 
-        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+        <div class="cp-card cp-section">
+            <p class="cp-section-title">CausalPath is described in detail in the following publications.</p>
+            <div class="cp-cites">
+                <p class="cp-cite">Babur, Ö., et al. (2021).
+                    <a href="https://www.sciencedirect.com/science/article/pii/S2666389921000830?via%3Dihub"
+                       target="_blank" rel="noopener">Causal interactions from proteomic profiles: Molecular data meet
+                        pathway knowledge.</a> <span class="cp-journal">Patterns</span>, 2(6), 100257.
+                </p>
+                <p class="cp-cite">Luna, A., et al. (2021).
+                    <a href="https://www.sciencedirect.com/science/article/pii/S2666166721006614" target="_blank"
+                       rel="noopener">Analyzing causal relationships in proteomic profiles using CausalPath.</a>
+                    <span class="cp-journal">STAR protocols</span>, 2(4), 100955.
+                </p>
+            </div>
+            <p class="cp-source-line">
+                <a href="https://github.com/PathwayAndDataAnalysis/causalpath" target="_blank" rel="noopener">Source
+                    code</a> is also available!
+            </p>
+        </div>
+
+        <div class="cp-card cp-section">
+            <p class="cp-collab-intro">This is a collaborative project with contributions from the below
+                institutions.</p>
+            <div class="cp-collab-row">
+                <a class="cp-collab-chip" href="https://www.umb.edu/" target="_blank" rel="noopener">
+                    <img src="/img/umass-boston.png" alt="University of Massachusetts Boston">
+                </a>
+                <a class="cp-collab-chip" href="https://www.ohsu.edu/" target="_blank" rel="noopener">
+                    <img src="/img/ohsu.png" alt="OHSU">
+                </a>
+                <a class="cp-collab-chip" href="https://w3.bilkent.edu.tr/bilkent/" target="_blank" rel="noopener">
+                    <img src="/img/bilkent-uni.png" alt="Bilkent University">
+                </a>
+                <a class="cp-collab-chip" href="https://www.dana-farber.org/" target="_blank" rel="noopener">
+                    <img src="/img/dana-farber-cancer.png" alt="Dana-Farber Cancer Institute">
+                </a>
+                <a class="cp-collab-chip" href="https://www.mdanderson.org/" target="_blank" rel="noopener">
+                    <img src="/img/md-anderson.png" alt="MD Anderson Cancer Center">
+                </a>
+                <a class="cp-collab-chip" href="https://www.broadinstitute.org/" target="_blank" rel="noopener">
+                    <img src="/img/broad-institute.png" alt="Broad Institute">
+                </a>
+            </div>
+        </div>
+
+        <p class="cp-contact">Please reach out to <a href="mailto:causalpath@cs.umb.edu">causalpath@cs.umb.edu</a> for
+            questions and comments.</p>
     </div>
 </div>
 
@@ -181,10 +228,28 @@
 
     <div class="" style="display: flex ; height: available;">
 
-        <div class="left" style="flex: 0 0 350px; min-width: 330px;">
+        <div class="left" style="flex: 0 0 232px; min-width: 232px;">
+
+            <div class="cp-brand">
+                <img src="/img/logo.png" alt="CausalPath logo">
+                <div class="cp-brand-name">CausalPath</div>
+            </div>
+
             <!-- Back Button -->
             <div id="back_menu">
-                <label id="back_button_label"><i class="fa fa-arrow-circle-left"></i>&nbsp;&nbsp;&nbsp;Back</label>
+                <label id="back_button_label">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M15 6l-6 6 6 6"/>
+                    </svg>
+                    Back to home
+                </label>
+            </div>
+
+            <!-- Current file callout (filled by cp-chrome.js from the active newt instance) -->
+            <div class="cp-file-callout" id="cp-file-callout" hidden>
+                <b id="cp-file-name"></b><br/>
+                <span id="cp-file-meta"></span>
             </div>
 
             <!-- Selected-genes subgraph badge (populated by subgraph-indicator.js) -->
@@ -195,8 +260,28 @@
 
         </div>
 
-        <div class="right" style="flex: 1;">
+        <div class="right" style="flex: 1; position: relative;">
 
+            <div class="cp-topbar">
+                <div class="cp-topbar-file" id="cp-topbar-file">No graph loaded</div>
+                <span class="cp-topbar-meta" id="cp-topbar-meta">0 nodes · 0 relations</span>
+                <div class="cp-spacer"></div>
+                <button type="button" class="cp-btn" id="cp-topbar-load">Load data</button>
+            </div>
+
+            <!-- Legend for the encodings the .format file applies to the graph -->
+            <div class="cp-legend" aria-hidden="true">
+                <div class="cp-legend-title">Legend</div>
+                <div class="cp-legend-row"><span class="cp-legend-swatch" style="background:#d8442a"></span>Up-regulated
+                </div>
+                <div class="cp-legend-row cp-legend-gap"><span class="cp-legend-swatch"
+                                                              style="background:#2b52c6"></span>Down-regulated
+                </div>
+                <div class="cp-legend-row"><span class="cp-legend-line" style="border-top:2px solid #2f9e44"></span>Activates
+                </div>
+                <div class="cp-legend-row"><span class="cp-legend-line" style="border-top:2px dashed #e03131"></span>Inhibits
+                </div>
+            </div>
 
             <!-- Html part of Newt -->
             <div id="graph-container" class="graph-container">
@@ -4916,8 +5001,8 @@
 
 <script src="../build/newt-bundle.js"></script>
 <script src="../javascript/index.js"></script>
+<script src="../javascript/causalpath-ui.js"></script>
 
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.8/themes/default/style.min.css"/>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jstree/3.3.8/jstree.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 

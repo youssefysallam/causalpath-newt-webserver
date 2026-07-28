@@ -1,0 +1,2045 @@
+/* ===========================================================================
+   CausalPath "Bench" theme — override layer.
+   ---------------------------------------------------------------------------
+   this file MUST be the last stylesheet in <head>. it only overrides rules;
+   it never depends on newt's DOM being changed. newt (the cytoscape editor
+   under public/javascript/newt + node_modules/chise|sbgnviz) stays vendored
+   and upgradeable — everything here is a selector override on markup newt
+   already renders.
+
+   node/edge visuals are NOT in here. a <canvas> can't be styled with css, so
+   those live in the cytoscape stylesheet (public/javascript/newt/cp-graph-theme.js).
+
+   everything is scoped under body.cp-theme so it stays contained.
+   =========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+body.cp-theme {
+	/* surfaces */
+	--cp-bg: #f6f1e8;
+	--cp-surface: #fffdf9;
+	--cp-sidebar: #efe7d8;
+	--cp-hover: #e6dcca;
+
+	/* lines */
+	--cp-border: #e0d7c5;
+	--cp-hairline: #e3dcce;
+	--cp-card-border: #e6ddcc;
+
+	/* accent */
+	--cp-accent: #d4573a;
+	--cp-accent-hover: #bd4529;
+	--cp-accent-text: #c0492c;
+
+	/* tinted accent surfaces */
+	--cp-tint: #fbeee7;
+	--cp-tint-border: #edcbbb;
+	--cp-tint-text: #b8442b;
+	--cp-chip: #f6e2da;
+
+	/* dropzone */
+	--cp-drop-border: #d9a88f;
+	--cp-drop-fill: #fdf7ef;
+
+	/* text */
+	--cp-text: #26211b;
+	--cp-text-2: #4a4438;
+	--cp-muted: #7a7266;
+	--cp-faint: #a89a83;
+	--cp-nav: #5f584c;
+	--cp-folder: #d09a3e;
+
+	/* destructive */
+	--cp-danger-fill: #f6e0dc;
+	--cp-danger-text: #c0392b;
+
+	/* type */
+	--cp-serif: 'Spectral', Georgia, 'Times New Roman', serif;
+	--cp-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--cp-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+	/* elevation */
+	--cp-shadow-card: 0 2px 10px rgba(90, 70, 40, 0.06);
+	--cp-shadow-raised: 0 2px 12px rgba(90, 70, 40, 0.07);
+	--cp-shadow-float: 0 3px 10px rgba(90, 70, 40, 0.1);
+
+	/* workspace metrics */
+	--cp-sidebar-w: 232px;
+	--cp-inspector-w: 302px;
+	--cp-topbar-h: 56px;
+	--cp-menubar-h: 37px;
+	--cp-toolbar-h: 47px;
+}
+
+/* ---------------------------------------------------------------- base --- */
+
+html:has(body.cp-theme),
+body.cp-theme {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	background: var(--cp-bg);
+	color: var(--cp-text);
+	font: 400 15.5px/1.5 var(--cp-sans);
+	-webkit-font-smoothing: antialiased;
+}
+
+body.cp-theme a {
+	color: var(--cp-accent-text);
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+body.cp-theme a:hover,
+body.cp-theme a:focus {
+	color: var(--cp-accent-hover);
+	text-decoration: none;
+}
+
+body.cp-theme :focus-visible {
+	outline: 2px solid var(--cp-accent);
+	outline-offset: 2px;
+}
+
+/* ================================================================
+   LANDING — guided "Start an analysis"
+   ================================================================ */
+
+body.cp-theme.cp-view-graph .cp-nav,
+body.cp-theme.cp-view-graph #menu-text-buttons {
+	display: none !important;
+}
+
+/* --- sticky top nav --- */
+
+.cp-nav {
+	position: sticky;
+	top: 0;
+	z-index: 20;
+	height: 62px;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 0 26px;
+	background: var(--cp-bg);
+	border-bottom: 1px solid var(--cp-hairline);
+}
+
+.cp-nav-logo {
+	height: 30px;
+	width: auto;
+}
+
+.cp-nav-title {
+	font-family: var(--cp-serif);
+	font-weight: 600;
+	font-size: 21px;
+	letter-spacing: -0.01em;
+	color: var(--cp-text);
+}
+
+.cp-rule {
+	width: 1px;
+	height: 20px;
+	background: var(--cp-border);
+	flex: none;
+}
+
+.cp-nav-tagline {
+	font-size: 12.5px;
+	color: var(--cp-muted);
+}
+
+.cp-spacer {
+	flex: 1;
+}
+
+.cp-nav-link {
+	font-size: 13.5px;
+	font-weight: 500;
+	color: var(--cp-nav);
+}
+
+.cp-nav-link:hover {
+	color: var(--cp-accent-text);
+}
+
+/* --- buttons --- */
+
+body.cp-theme .cp-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	background: var(--cp-accent);
+	color: #fff;
+	border: none;
+	border-radius: 10px;
+	padding: 10px 17px;
+	font-family: var(--cp-sans);
+	font-size: 13.5px !important;
+	font-weight: 600;
+	line-height: 1.2;
+	cursor: pointer;
+	transition: background 0.15s ease;
+}
+
+body.cp-theme .cp-btn:hover {
+	background: var(--cp-accent-hover);
+	color: #fff;
+}
+
+body.cp-theme .cp-btn-block {
+	width: 100%;
+	margin-top: 16px;
+	border-radius: 11px;
+	padding: 12px;
+}
+
+/* --- page shell --- */
+
+.cp-landing {
+	max-width: 1080px;
+	margin: 0 auto;
+	padding: 40px 28px 84px;
+}
+
+.cp-hero {
+	display: grid;
+	grid-template-columns: 1.02fr 0.98fr;
+	gap: 28px;
+	align-items: start;
+	margin-bottom: 32px;
+}
+
+.cp-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-family: var(--cp-mono);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	color: var(--cp-accent-text);
+	background: var(--cp-tint);
+	border: 1px solid var(--cp-tint-border);
+	border-radius: 999px;
+	padding: 6px 12px;
+	margin-bottom: 18px;
+}
+
+.cp-h1 {
+	font-family: var(--cp-serif);
+	font-size: 40px;
+	line-height: 1.08;
+	font-weight: 600;
+	letter-spacing: -0.015em;
+	color: var(--cp-text);
+	margin: 0 0 18px;
+}
+
+.cp-lede {
+	font-size: 15.5px;
+	line-height: 1.65;
+	color: var(--cp-text-2);
+	margin: 0 0 22px;
+}
+
+.cp-card {
+	background: var(--cp-surface);
+	border: 1px solid var(--cp-card-border);
+	border-radius: 14px;
+	box-shadow: var(--cp-shadow-card);
+}
+
+.cp-figure {
+	padding: 18px;
+}
+
+.cp-figure img {
+	width: 100%;
+	height: auto;
+	display: block;
+	border-radius: 6px;
+}
+
+/* --- setup card --- */
+
+.cp-setup {
+	padding: 22px;
+	box-shadow: var(--cp-shadow-raised);
+}
+
+.cp-setup-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+
+.cp-setup-title {
+	font-family: var(--cp-serif);
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--cp-text);
+	margin: 0;
+}
+
+.cp-stepper {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-family: var(--cp-mono);
+	font-size: 11px;
+	color: var(--cp-faint);
+}
+
+.cp-step {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.cp-step-num {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	display: grid;
+	place-items: center;
+	font-size: 10px;
+	font-weight: 700;
+	background: var(--cp-sidebar);
+	border: 1px solid #d9cfbb;
+}
+
+.cp-step-sep {
+	color: #cabfa8;
+}
+
+.cp-step.is-done .cp-step-num {
+	background: var(--cp-accent);
+	border-color: var(--cp-accent);
+	color: #fff;
+}
+
+.cp-step.is-current {
+	color: var(--cp-accent-text);
+	font-weight: 600;
+}
+
+.cp-step.is-current .cp-step-num {
+	background: var(--cp-chip);
+	border-color: var(--cp-accent);
+}
+
+/* --- segmented control --- */
+
+.cp-seg {
+	display: flex;
+	gap: 5px;
+	padding: 5px;
+	border-radius: 12px;
+	background: var(--cp-sidebar);
+	border: 1px solid var(--cp-border);
+	margin-bottom: 18px;
+}
+
+body.cp-theme .cp-seg-item {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	padding: 8px 6px;
+	border: none;
+	background: transparent;
+	border-radius: 8px;
+	font-family: var(--cp-sans);
+	font-size: 12.5px !important;
+	font-weight: 500;
+	color: var(--cp-muted);
+	cursor: pointer;
+	transition: 0.15s ease;
+	white-space: nowrap;
+}
+
+body.cp-theme .cp-seg-item:hover {
+	color: var(--cp-text-2);
+}
+
+body.cp-theme .cp-seg-item.is-active {
+	background: var(--cp-surface);
+	color: var(--cp-accent-text);
+	font-family: var(--cp-serif);
+	font-weight: 600;
+	box-shadow: 0 1px 3px rgba(90, 70, 40, 0.1);
+}
+
+body.cp-theme .cp-seg-item svg {
+	flex: none;
+}
+
+/* --- mode panels --- */
+
+.cp-mode[hidden] {
+	display: none;
+}
+
+.cp-mode-title {
+	font-family: var(--cp-serif);
+	font-size: 17px;
+	font-weight: 600;
+	color: var(--cp-text);
+	margin: 0 0 4px;
+}
+
+.cp-mode-help {
+	font-size: 12.5px;
+	line-height: 1.5;
+	color: var(--cp-muted);
+	margin: 0 0 14px;
+}
+
+/* --- dropzone (wraps the real <input type=file>, so the picker + native
+       file drop both keep working untouched) --- */
+
+.cp-drop {
+	position: relative;
+	border-radius: 12px;
+	border: 1.6px dashed var(--cp-drop-border);
+	background: var(--cp-drop-fill);
+	padding: 26px 18px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 11px;
+	text-align: center;
+	cursor: pointer;
+	transition: 0.15s ease;
+}
+
+.cp-drop:hover,
+.cp-drop.drag-and-drop-file {
+	background: var(--cp-tint) !important;
+	border: 1.6px dashed var(--cp-accent) !important;
+}
+
+.cp-drop-icon {
+	width: 46px;
+	height: 46px;
+	border-radius: 13px;
+	background: var(--cp-chip);
+	display: grid;
+	place-items: center;
+	color: var(--cp-accent-text);
+}
+
+.cp-drop-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--cp-text);
+}
+
+.cp-drop-sub {
+	font-size: 12px;
+	color: var(--cp-faint);
+	margin-top: 2px;
+}
+
+.cp-drop-chip {
+	font-family: var(--cp-mono);
+	font-size: 10.5px;
+	color: var(--cp-accent-text);
+	background: var(--cp-chip);
+	border-radius: 6px;
+	padding: 3px 9px;
+}
+
+/* --- demo chips --- */
+
+.cp-demo-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 9px;
+}
+
+body.cp-theme .cp-demo-chip {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	padding: 12px;
+	border-radius: 11px;
+	background: var(--cp-drop-fill);
+	border: 1px solid #ede2d0;
+	cursor: pointer;
+	transition: 0.15s ease;
+	font-family: var(--cp-sans);
+	font-size: 12.5px !important;
+	font-weight: 500;
+	color: var(--cp-text-2);
+	text-align: left;
+	overflow: hidden;
+}
+
+body.cp-theme .cp-demo-chip:hover {
+	background: var(--cp-tint);
+	border-color: var(--cp-drop-border);
+}
+
+.cp-demo-dot {
+	width: 9px;
+	height: 9px;
+	border-radius: 3px;
+	background: var(--cp-accent);
+	flex: none;
+}
+
+.cp-demo-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* --- publications / collaborators / contact --- */
+
+.cp-section {
+	padding: 26px 28px;
+	margin-bottom: 22px;
+}
+
+.cp-section-title {
+	font-family: var(--cp-serif);
+	font-size: 19px;
+	font-weight: 600;
+	color: var(--cp-text);
+	margin: 0 0 14px;
+}
+
+.cp-cites {
+	display: flex;
+	flex-direction: column;
+	gap: 13px;
+	max-width: 840px;
+}
+
+.cp-cite {
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--cp-text-2);
+	margin: 0;
+	padding-left: 20px;
+	text-indent: -20px;
+}
+
+.cp-journal {
+	font-family: var(--cp-serif);
+	font-style: italic;
+}
+
+.cp-source-line {
+	font-size: 13.5px;
+	color: var(--cp-text-2);
+	margin: 15px 0 0;
+}
+
+.cp-collab-intro {
+	font-size: 13.5px;
+	color: var(--cp-muted);
+	margin: 0 0 18px;
+}
+
+.cp-collab-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: center;
+}
+
+.cp-collab-chip {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 52px;
+	padding: 9px 15px;
+	background: #fff;
+	border: 1px solid var(--cp-card-border);
+	border-radius: 10px;
+	transition: 0.15s ease;
+}
+
+.cp-collab-chip:hover {
+	border-color: var(--cp-drop-border);
+	box-shadow: var(--cp-shadow-card);
+}
+
+.cp-collab-chip img {
+	max-height: 34px;
+	width: auto;
+	display: block;
+}
+
+.cp-contact {
+	font-size: 13.5px;
+	color: var(--cp-text-2);
+	margin: 0;
+	padding-left: 4px;
+}
+
+@media (max-width: 900px) {
+	.cp-hero {
+		grid-template-columns: 1fr;
+	}
+
+	.cp-nav-tagline,
+	.cp-rule {
+		display: none;
+	}
+}
+
+/* ================================================================
+   GRAPH WORKSPACE — newt, re-skinned.
+   every rule below overrides an existing newt/bootstrap selector.
+   ================================================================ */
+
+body.cp-theme #folder-trees-graphs {
+	display: none !important;
+}
+
+body.cp-theme.cp-view-graph {
+	overflow: hidden;
+}
+
+/* NB: this is deliberately unpositioned. position:fixed/sticky always creates a
+   stacking context, which would trap newt's bootstrap modals (z-index 1050)
+   inside it — .modal-backdrop is a child of <body> at z-index 1040 and would
+   then cover every dialog, making them impossible to click or dismiss.
+   the landing nav and #menu-text-buttons are display:none in this view, so a
+   plain 100vh block already fills the viewport. */
+body.cp-theme.cp-view-graph #folder-trees-graphs {
+	display: block !important;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+	background: var(--cp-bg);
+}
+
+body.cp-theme #folder-trees-graphs > div {
+	height: 100%;
+	display: flex !important;
+	align-items: stretch;
+	min-height: 0;
+}
+
+/* ------------------------------------------------------- left sidebar --- */
+
+body.cp-theme #folder-trees-graphs .left {
+	flex: 0 0 var(--cp-sidebar-w) !important;
+	min-width: var(--cp-sidebar-w) !important;
+	width: var(--cp-sidebar-w);
+	background: var(--cp-sidebar);
+	border-right: 1px solid var(--cp-border);
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	position: relative;
+}
+
+body.cp-theme #folder-trees-graphs .right {
+	flex: 1 1 auto !important;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	min-height: 0;
+	position: relative;
+}
+
+/* the legend + newt's own overlays are hidden until a workspace is open */
+body.cp-theme .cp-legend,
+body.cp-theme .cp-topbar {
+	visibility: hidden;
+}
+
+body.cp-theme.cp-view-graph .cp-legend,
+body.cp-theme.cp-view-graph .cp-topbar {
+	visibility: visible;
+}
+
+.cp-brand {
+	display: flex;
+	align-items: center;
+	gap: 11px;
+	padding: 20px 16px 16px;
+	flex: none;
+}
+
+.cp-brand img {
+	height: 28px;
+	width: auto;
+}
+
+.cp-brand-name {
+	font-family: var(--cp-serif);
+	font-weight: 600;
+	font-size: 20px;
+	letter-spacing: -0.01em;
+	color: var(--cp-text);
+}
+
+/* back button — newt-adjacent app markup, restyled in place */
+body.cp-theme #back_menu {
+	margin: 0;
+	padding: 0 12px 10px;
+	flex: none;
+}
+
+body.cp-theme.cp-view-graph #back_menu {
+	display: block !important;
+}
+
+body.cp-theme #back_button_label {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	margin: 0;
+	background: var(--cp-surface);
+	border: 1px solid var(--cp-border);
+	border-radius: 9px;
+	padding: 9px 11px;
+	font-family: var(--cp-sans);
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--cp-nav);
+	cursor: pointer;
+	transition: 0.15s ease;
+}
+
+body.cp-theme #back_button_label:hover {
+	background: var(--cp-surface);
+	border-color: var(--cp-accent);
+	color: var(--cp-accent-text);
+}
+
+/* current-file callout */
+.cp-file-callout {
+	margin: 0 12px 12px;
+	flex: none;
+	background: var(--cp-tint);
+	border: 1px solid var(--cp-tint-border);
+	border-radius: 9px;
+	padding: 9px 11px;
+	font-size: 11.5px;
+	color: var(--cp-tint-text);
+	line-height: 1.5;
+}
+
+.cp-file-callout b {
+	font-family: var(--cp-mono);
+	font-weight: 600;
+	word-break: break-all;
+}
+
+.cp-file-callout span {
+	color: #a06249;
+}
+
+/* --- file tree (jstree) --- */
+
+/* the tree is deeply nested (analysis > FDR > comparison > cluster > file), so
+   jstree's stock 24px-per-level indent pushes file names past the sidebar and
+   forces horizontal scrolling. everything below tightens the row geometry so
+   the names get the width instead, and ellipsises whatever still doesn't fit
+   (the full name stays available as a tooltip). */
+body.cp-theme #folder-tree-container {
+	position: static;
+	flex: 1 1 auto;
+	min-height: 0;
+	width: auto;
+	max-height: none;
+	margin: 0;
+	padding: 2px 8px 16px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	font-family: var(--cp-mono);
+	background: transparent;
+}
+
+/* one row = 22px everywhere: node, anchor and both icons. jstree ships them at
+   24px while our anchor is 22px, which is what knocked the file icon out of
+   line with its highlight. */
+body.cp-theme #folder-tree-container.jstree-default .jstree-node {
+	min-height: 22px;
+	line-height: 22px;
+	min-width: 0;
+	margin-left: 12px;
+	/* drop the dotted connector rails — indentation alone reads the nesting */
+	background-image: none;
+}
+
+body.cp-theme #folder-tree-container.jstree-default > .jstree-container-ul > .jstree-node {
+	margin-left: 0;
+}
+
+body.cp-theme #folder-tree-container.jstree-default .jstree-anchor {
+	color: var(--cp-text-2);
+	font-family: var(--cp-mono);
+	font-size: 12px;
+	line-height: 22px;
+	height: 22px;
+	padding: 0 5px 0 2px;
+	border-radius: 6px;
+	transition: background 0.15s ease;
+	/* keep long names inside the sidebar instead of scrolling it sideways.
+	   17px = the folder caret column; files get 8px more via .jstree-leaf */
+	max-width: calc(100% - 17px);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: top;
+}
+
+body.cp-theme #folder-tree-container.jstree-default .jstree-icon,
+body.cp-theme #folder-tree-container.jstree-default .jstree-icon:empty {
+	width: 18px;
+	height: 22px;
+	line-height: 22px;
+	vertical-align: top;
+	background-size: 15px 15px;
+	background-position: center;
+}
+
+body.cp-theme #folder-tree-container.jstree-default .jstree-anchor > .jstree-icon {
+	filter: none;
+	margin-right: 4px;
+}
+
+/* narrow caret column, drawn as text so it survives the tighter width */
+body.cp-theme #folder-tree-container.jstree-default .jstree-ocl {
+	width: 15px;
+	background-image: none !important;
+	color: #b0a48d;
+	font-size: 10px;
+	text-align: center;
+}
+
+/* files have no caret, so give that column back to the file name */
+body.cp-theme #folder-tree-container.jstree-default .jstree-leaf > .jstree-ocl {
+	width: 6px;
+}
+
+body.cp-theme #folder-tree-container.jstree-default .jstree-leaf > .jstree-anchor {
+	max-width: calc(100% - 8px);
+}
+
+body.cp-theme #folder-tree-container.jstree-default .jstree-open > .jstree-ocl::after {
+	content: '\25BE';
+}
+
+body.cp-theme #folder-tree-container.jstree-default .jstree-closed > .jstree-ocl::after {
+	content: '\25B8';
+}
+
+body.cp-theme .jstree-default .jstree-hovered {
+	background: var(--cp-hover);
+	box-shadow: none;
+	border-radius: 6px;
+}
+
+body.cp-theme .jstree-default .jstree-clicked,
+body.cp-theme .jstree-default .jstree-wholerow-clicked {
+	background: var(--cp-tint);
+	background-image: none;
+	color: var(--cp-tint-text);
+	font-weight: 600;
+	box-shadow: inset 2px 0 0 var(--cp-accent);
+	border-radius: 6px;
+}
+
+/* folder glyph in the bench gold instead of the jstree sprite */
+body.cp-theme .jstree-default .jstree-themeicon-custom {
+	background-size: contain !important;
+}
+
+body.cp-theme .jstree-default i.jstree-icon.jstree-themeicon:not(.jstree-themeicon-custom) {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23d09a3e'%3E%3Cpath d='M3 6a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z'/%3E%3C/svg%3E") !important;
+	background-position: center !important;
+	background-size: 15px 15px !important;
+}
+
+/* --- subgraph indicator badge (runtime-injected styles; beaten on
+       specificity, not on source order) --- */
+
+body.cp-theme .subgraph-indicator {
+	margin: 0 12px 10px;
+	border: 1px solid var(--cp-tint-border);
+	border-radius: 9px;
+	background: var(--cp-tint);
+	font-family: var(--cp-sans);
+	font-size: 11.5px;
+	color: var(--cp-tint-text);
+}
+
+body.cp-theme .subgraph-indicator-bar {
+	padding: 8px 10px;
+	border-radius: 8px;
+}
+
+body.cp-theme .subgraph-indicator-bar:hover {
+	background: #f7e4da;
+}
+
+body.cp-theme .subgraph-indicator-label {
+	font-family: var(--cp-mono);
+	font-weight: 600;
+}
+
+body.cp-theme .subgraph-indicator-caret {
+	color: #c08a72;
+}
+
+body.cp-theme .subgraph-indicator-chip {
+	background: var(--cp-surface);
+	border: 1px solid var(--cp-tint-border);
+	border-radius: 999px;
+	padding: 2px 8px;
+	font-family: var(--cp-mono);
+	color: var(--cp-text-2);
+}
+
+body.cp-theme .subgraph-indicator-chip-x {
+	color: var(--cp-faint);
+}
+
+body.cp-theme .subgraph-indicator-chip-x:hover {
+	color: var(--cp-danger-text);
+}
+
+body.cp-theme .subgraph-indicator-input {
+	border: 1px solid var(--cp-border);
+	border-radius: 7px;
+	padding: 4px 7px;
+	background: var(--cp-surface);
+	font-family: var(--cp-sans);
+	height: auto;
+}
+
+body.cp-theme .subgraph-indicator-add {
+	border: 1px solid var(--cp-accent);
+	background: var(--cp-accent);
+	border-radius: 7px;
+	padding: 4px 10px;
+	font-weight: 600;
+}
+
+body.cp-theme .subgraph-indicator-add:hover {
+	background: var(--cp-accent-hover);
+	border-color: var(--cp-accent-hover);
+}
+
+body.cp-theme .subgraph-indicator-full {
+	color: var(--cp-accent-text);
+	text-decoration: underline;
+}
+
+body.cp-theme .subgraph-indicator-note {
+	color: var(--cp-danger-text);
+}
+
+body.cp-theme .subgraph-indicator-suggestions {
+	border: 1px solid var(--cp-border);
+	border-radius: 8px;
+	background: var(--cp-surface);
+	box-shadow: var(--cp-shadow-float);
+	overflow: hidden auto;
+}
+
+body.cp-theme .subgraph-indicator-suggestion {
+	padding: 5px 9px;
+	font-family: var(--cp-mono);
+	font-size: 11.5px;
+	color: var(--cp-text-2);
+}
+
+body.cp-theme .subgraph-indicator-suggestion:hover,
+body.cp-theme .subgraph-indicator-suggestion.active {
+	background: var(--cp-chip);
+	color: var(--cp-accent-text);
+}
+
+/* --- subgraph overlay preview (runtime-injected styles, same as above) ---
+       kept visually identical to the main canvas: same warm paper, same
+       dotted grid, same chrome — only the frame around it differs. */
+
+body.cp-theme .subgraph-preview-panel {
+	background: var(--cp-surface);
+	border: 1px solid var(--cp-border);
+	border-radius: 14px;
+	box-shadow: 0 10px 34px rgba(90, 70, 40, 0.22);
+}
+
+body.cp-theme .subgraph-preview-header {
+	padding: 10px 14px;
+	background: var(--cp-sidebar);
+	border-bottom: 1px solid var(--cp-border);
+}
+
+body.cp-theme .subgraph-preview-title {
+	font-family: var(--cp-serif);
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--cp-text);
+}
+
+body.cp-theme .subgraph-preview-close {
+	color: var(--cp-faint);
+	font-size: 20px;
+	border-radius: 6px;
+	transition: 0.15s ease;
+}
+
+body.cp-theme .subgraph-preview-close:hover {
+	color: var(--cp-accent-text);
+	background: var(--cp-chip);
+}
+
+/* the same paper the main canvas sits on */
+body.cp-theme .subgraph-preview-cy {
+	background-color: #faf6ee;
+	background-image: radial-gradient(circle, #e8ddc8 1.1px, transparent 1.1px);
+	background-size: 22px 22px;
+}
+
+body.cp-theme .subgraph-preview-footer {
+	padding: 10px 14px;
+	background: var(--cp-bg);
+	border-top: 1px solid var(--cp-hairline);
+}
+
+body.cp-theme .subgraph-preview-promote {
+	background: var(--cp-accent);
+	color: #fff;
+	border: 1px solid var(--cp-accent) !important;
+	border-radius: 9px !important;
+	padding: 8px 15px;
+	font-family: var(--cp-sans);
+	font-size: 12.5px !important;
+	font-weight: 600;
+}
+
+body.cp-theme .subgraph-preview-promote:hover,
+body.cp-theme .subgraph-preview-promote:focus {
+	background: var(--cp-accent-hover);
+	color: #fff;
+	border-color: var(--cp-accent-hover) !important;
+}
+
+body.cp-theme .subgraph-preview-resize {
+	background: linear-gradient(135deg, transparent 50%, var(--cp-border) 50%);
+	border-bottom-right-radius: 14px;
+}
+
+/* ------------------------------------------------------------ top bar --- */
+
+.cp-topbar {
+	height: var(--cp-topbar-h);
+	flex: none;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 0 22px;
+	background: var(--cp-bg);
+	border-bottom: 1px solid var(--cp-hairline);
+}
+
+.cp-topbar-file {
+	font-family: var(--cp-serif);
+	font-size: 20px;
+	font-weight: 600;
+	color: var(--cp-text);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 46vw;
+}
+
+.cp-topbar-meta {
+	font-family: var(--cp-mono);
+	font-size: 11px;
+	color: var(--cp-faint);
+	white-space: nowrap;
+}
+
+body.cp-theme .cp-topbar .cp-btn {
+	border-radius: 9px;
+	padding: 9px 16px;
+	font-size: 13px !important;
+}
+
+/* --------------------------------------------------- newt shell layout --- */
+
+body.cp-theme #graph-container {
+	margin: 0;
+	flex: 1 1 auto;
+	min-height: 0;
+	display: none;
+	align-items: stretch;
+	justify-content: flex-start;
+	flex-direction: column;
+}
+
+body.cp-theme.cp-view-graph #graph-container {
+	display: flex !important;
+}
+
+body.cp-theme #newt-graph-container {
+	border: none;
+	flex: 1 1 auto;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+/* the canvas/inspector table is the only thing that should grow. everything
+   else newt keeps in here (menubar + toolbar wrapper, network tabs, the modal
+   and <script type="text/template"> blocks) stays at its natural size. */
+body.cp-theme #newt-graph-container > *:not(#sbgn-inspector-and-canvas) {
+	flex: none;
+}
+
+/* ----------------------------------------------------------- menu bar --- */
+
+body.cp-theme .nav-menu.sbgn-nav-menu {
+	width: 100% !important;
+	height: var(--cp-menubar-h);
+	min-height: var(--cp-menubar-h);
+	margin: 0;
+	border: none;
+	border-bottom: 1px solid var(--cp-border);
+	border-radius: 0;
+	background: var(--cp-sidebar);
+}
+
+body.cp-theme .sbgn-nav-bar {
+	width: 100% !important;
+	min-height: var(--cp-menubar-h);
+	height: var(--cp-menubar-h);
+	margin: 0;
+	border: none;
+	border-radius: 0;
+	background-color: transparent !important;
+	display: flex;
+	align-items: center;
+	padding: 0 8px;
+}
+
+body.cp-theme .sbgn-nav-bar > div {
+	display: flex;
+	align-items: center;
+	width: 100%;
+}
+
+body.cp-theme .sbgn-nav-menu .navbar-nav {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	margin: 0;
+	float: none;
+}
+
+body.cp-theme .sbgn-nav-bar li.dropdown {
+	float: none;
+}
+
+body.cp-theme .sbgn-nav-menu a,
+body.cp-theme .sbgn-nav-bar .navbar-nav > li > a {
+	font-family: var(--cp-sans);
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--cp-nav);
+	border-radius: 7px;
+	padding: 5px 10px !important;
+	line-height: 1.4;
+	transition: 0.15s ease;
+}
+
+body.cp-theme .sbgn-nav-bar .navbar-nav > li > a:hover,
+body.cp-theme .sbgn-nav-bar .navbar-nav > li > a:focus {
+	background: var(--cp-hover);
+	color: var(--cp-text);
+}
+
+body.cp-theme .sbgn-nav-menu .navbar .nav li.dropdown.open > .dropdown-toggle,
+body.cp-theme .sbgn-nav-menu .navbar .nav li.dropdown.active > .dropdown-toggle,
+body.cp-theme .sbgn-nav-menu .navbar .nav li.dropdown.open.active > .dropdown-toggle {
+	background-color: var(--cp-chip);
+	color: var(--cp-accent-text) !important;
+}
+
+/* newt attribution link — newt keeps it in its own menubar markup */
+body.cp-theme .newt-logo {
+	height: 17px !important;
+	width: auto;
+	opacity: 0.85;
+	margin: 0 4px 0 0;
+	padding: 0;
+	float: right;
+	transition: opacity 0.15s ease;
+}
+
+body.cp-theme .newt-logo:hover {
+	opacity: 1;
+}
+
+/* --- dropdown menus --- */
+
+body.cp-theme .sbgn-nav-bar .dropdown-menu,
+body.cp-theme .sbgn-nav-menu .dropdown-menu {
+	background-color: var(--cp-surface) !important;
+	border: 1px solid var(--cp-border) !important;
+	border-radius: 11px !important;
+	box-shadow: 0 8px 24px rgba(90, 70, 40, 0.14);
+	padding: 6px;
+	margin-top: 4px;
+}
+
+body.cp-theme .sbgn-nav-menu .dropdown-menu li > a {
+	font-family: var(--cp-sans);
+	font-size: 12.5px;
+	font-weight: 400;
+	color: var(--cp-text-2);
+	border-radius: 7px;
+	padding: 6px 10px !important;
+}
+
+body.cp-theme .sbgn-nav-menu .dropdown-menu li > a:hover,
+body.cp-theme .sbgn-nav-menu .dropdown-menu li > a:focus,
+body.cp-theme .sbgn-nav-menu .dropdown-submenu:hover > a,
+body.cp-theme .sbgn-nav-menu .dropdown-menu .active > a,
+body.cp-theme .sbgn-nav-menu .dropdown-menu .active > a:hover {
+	background-color: var(--cp-chip);
+	color: var(--cp-accent-text);
+}
+
+body.cp-theme .dropdown-menu .divider {
+	background-color: var(--cp-hairline);
+}
+
+body.cp-theme .dropdown-submenu > a:after {
+	border-left-color: var(--cp-faint);
+}
+
+body.cp-theme .dropdown-submenu:hover > a:after {
+	border-left-color: var(--cp-accent-text);
+}
+
+body.cp-theme .sbgn-nav-menu li.dropdown.open > a.dropdown-toggle {
+	color: var(--cp-accent-text) !important;
+}
+
+/* ------------------------------------------------------------ toolbar --- */
+
+body.cp-theme #sbgn-toolbar {
+	width: 100% !important;
+	height: var(--cp-toolbar-h);
+	margin: 0 !important;
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	padding: 0 14px;
+	background: var(--cp-bg);
+	border-bottom: 1px solid var(--cp-hairline);
+	overflow-x: auto;
+	overflow-y: hidden;
+	flex: none;
+}
+
+/* toolbar groups become rounded pods */
+body.cp-theme #sbgn-toolbar .inside-menu {
+	float: none;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	padding: 3px !important;
+	border: 1px solid var(--cp-hairline);
+	border-radius: 9px;
+	background: var(--cp-surface);
+	flex: none;
+}
+
+/* the group separators are redundant once groups have their own pod */
+body.cp-theme #sbgn-toolbar .menu-break-large,
+body.cp-theme #sbgn-toolbar .menu-break-small {
+	display: none;
+}
+
+body.cp-theme #sbgn-toolbar .sbgn-toolbar-element {
+	float: none;
+	margin: 0;
+	padding: 0 !important;
+	width: 30px;
+	height: 30px;
+	border-radius: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.15s ease;
+}
+
+body.cp-theme #sbgn-toolbar .sbgn-toolbar-element:hover {
+	background-color: var(--cp-sidebar) !important;
+	border-radius: 6px;
+}
+
+body.cp-theme #sbgn-toolbar img {
+	height: 17px;
+	width: auto;
+	opacity: 0.62;
+	/* recolor newt's grey svg icons to the bench ink (#7a6f5e) without
+	   touching the svg files themselves */
+	filter: sepia(0.35) saturate(0.75) hue-rotate(-8deg);
+	transition: opacity 0.15s ease, filter 0.15s ease;
+}
+
+body.cp-theme #sbgn-toolbar .sbgn-toolbar-element:hover img,
+body.cp-theme #sbgn-toolbar img:hover {
+	opacity: 1 !important;
+	filter: sepia(0.55) saturate(2.4) hue-rotate(-18deg) brightness(0.92);
+}
+
+/* destructive control gets the danger hover */
+body.cp-theme #sbgn-toolbar .sbgn-toolbar-element:has(#delete-selected-simple-icon):hover,
+body.cp-theme #sbgn-toolbar .sbgn-toolbar-element:has(#delete-selected-smart-icon):hover {
+	background-color: var(--cp-danger-fill) !important;
+}
+
+/* active mode (select / marquee / lasso) */
+body.cp-theme #sbgn-toolbar .selected-mode,
+body.cp-theme .selected-mode {
+	border: none;
+	border-radius: 7px;
+	background: var(--cp-chip);
+	box-shadow: inset 0 0 0 1.5px var(--cp-accent);
+}
+
+body.cp-theme #sbgn-toolbar .selected-mode img {
+	opacity: 1;
+	filter: sepia(0.55) saturate(2.4) hue-rotate(-18deg) brightness(0.92);
+}
+
+body.cp-theme .image-button-disabled-appearance {
+	opacity: 0.25;
+}
+
+/* align dropdown pod */
+body.cp-theme #sbgn-toolbar .sbgn-dd-list {
+	width: auto;
+	height: 30px;
+	display: flex;
+	align-items: center;
+	border-radius: 6px;
+}
+
+/* these carry bootstrap's .btn class, so they'd otherwise inherit the accent
+   outline meant for dialog buttons — toolbar controls stay flat */
+body.cp-theme #sbgn-toolbar .sbgn-dd-list > button,
+body.cp-theme #sbgn-toolbar .sbgn-dd-list > button:focus {
+	height: 30px;
+	top: 0;
+	transform: none;
+	background: transparent;
+	border: none !important;
+	box-shadow: none;
+	border-radius: 6px !important;
+	color: #7a6f5e;
+	padding: 3px 5px !important;
+}
+
+body.cp-theme #sbgn-toolbar .sbgn-dd-list > button:hover {
+	background: var(--cp-sidebar);
+	border: none !important;
+}
+
+body.cp-theme #sbgn-toolbar .sbgn-dd-list > button > div {
+	top: 0;
+	transform: none;
+	display: flex;
+	align-items: center;
+}
+
+body.cp-theme #sbgn-toolbar .sbgn-dd-list .caret {
+	border-top-color: #7a6f5e;
+}
+
+/* search field */
+body.cp-theme #sbgn-toolbar .inside-menu:has(#search-by-label-text-box) {
+	padding: 3px 8px !important;
+	gap: 5px;
+}
+
+body.cp-theme #search-by-label-text-box {
+	width: 110px;
+	height: 26px;
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	font-family: var(--cp-sans);
+	font-size: 12.5px !important;
+	color: var(--cp-text);
+	padding-left: 2px;
+	outline-offset: 0;
+}
+
+body.cp-theme #search-by-label-text-box::placeholder {
+	color: var(--cp-faint);
+}
+
+body.cp-theme #search-by-label-text-box:focus {
+	box-shadow: none;
+	outline: none;
+}
+
+/* push layout + about to the right edge, per the design */
+body.cp-theme #sbgn-toolbar .inside-menu:has(#perform-layout-icon) {
+	margin-left: auto;
+}
+
+/* ------------------------------------------------ canvas + inspector --- */
+
+/* newt lays the canvas and the inspector out in a <table>; display:contents
+   turns it into a flex row without touching the markup */
+body.cp-theme #sbgn-inspector-and-canvas {
+	display: flex;
+	width: 100%;
+	flex: 1 1 auto;
+	min-height: 0;
+	margin: 0;
+	overflow: hidden !important;
+}
+
+body.cp-theme #sbgn-inspector-and-canvas > tbody,
+body.cp-theme #sbgn-inspector-and-canvas > tbody > tr {
+	display: contents;
+}
+
+body.cp-theme #sbgn-inspector-and-canvas > tbody > tr > td {
+	display: block;
+	padding: 0;
+	min-height: 0;
+}
+
+body.cp-theme #sbgn-inspector-and-canvas > tbody > tr > td:first-child {
+	flex: 1 1 auto;
+	min-width: 0;
+	position: relative;
+}
+
+body.cp-theme #sbgn-inspector-and-canvas > tbody > tr > td:last-child {
+	flex: 0 0 var(--cp-inspector-w);
+	width: var(--cp-inspector-w);
+}
+
+/* newt's dynamicResize() writes inline px sizes here — override them so the
+   flex shell owns the geometry. cytoscape re-reads its container on resize. */
+body.cp-theme #network-panels-container {
+	width: 100% !important;
+	height: 100% !important;
+	margin: 0;
+	border: none;
+	border-radius: 0;
+	float: none;
+	/* warm dotted paper under the (transparent) cytoscape canvas */
+	background-color: #faf6ee;
+	background-image: radial-gradient(circle, #e8ddc8 1.1px, transparent 1.1px);
+	background-size: 22px 22px;
+}
+
+body.cp-theme #network-panels-container.drag-and-drop-file {
+	border: 2px dashed var(--cp-accent) !important;
+	background-color: var(--cp-tint);
+}
+
+body.cp-theme #sbgn-inspector {
+	width: 100% !important;
+	height: 100% !important;
+	margin: 0;
+	border: none;
+	border-left: 1px solid var(--cp-border);
+	border-radius: 0;
+	float: none;
+	background: var(--cp-sidebar);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden !important;
+}
+
+/* --- canvas overlays --- */
+
+/* sits over the canvas cell; offset past the inspector so it never covers it */
+.cp-legend {
+	position: absolute;
+	bottom: 16px;
+	right: calc(var(--cp-inspector-w) + 16px);
+	z-index: 900;
+	background: rgba(255, 253, 249, 0.95);
+	border: 1px solid var(--cp-card-border);
+	border-radius: 11px;
+	padding: 11px 13px;
+	box-shadow: 0 4px 14px rgba(90, 70, 40, 0.1);
+	font-size: 11px;
+	color: var(--cp-text-2);
+	pointer-events: none;
+}
+
+.cp-legend-title {
+	font-family: var(--cp-serif);
+	font-weight: 700;
+	color: var(--cp-text);
+	margin-bottom: 7px;
+	font-size: 11px;
+	letter-spacing: 0.04em;
+}
+
+.cp-legend-row {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	margin-bottom: 5px;
+}
+
+.cp-legend-row:last-child {
+	margin-bottom: 0;
+}
+
+.cp-legend-row.cp-legend-gap {
+	margin-bottom: 8px;
+}
+
+.cp-legend-swatch {
+	width: 16px;
+	height: 11px;
+	border-radius: 3px;
+	display: inline-block;
+	flex: none;
+}
+
+.cp-legend-line {
+	width: 18px;
+	height: 0;
+	display: inline-block;
+	flex: none;
+}
+
+/* --- panzoom control --- */
+
+body.cp-theme .cy-panzoom {
+	z-index: 900 !important;
+	top: 16px;
+	left: 16px;
+	right: auto;
+}
+
+body.cp-theme .cy-panzoom-panner {
+	border: 1px solid var(--cp-border);
+	background: var(--cp-surface);
+	box-shadow: var(--cp-shadow-float);
+	color: var(--cp-faint);
+}
+
+/* the extension positions these absolutely and the slider drag depends on those
+   offsets, so only the box is restyled — never the top/left values */
+body.cp-theme .cy-panzoom-zoom-button,
+body.cp-theme .cy-panzoom-reset {
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	padding: 4px;
+	border: 1px solid var(--cp-border);
+	background: var(--cp-surface);
+	box-shadow: var(--cp-shadow-float);
+	border-radius: 8px;
+	color: #7a6f5e;
+	font-size: 12px;
+	transition: 0.15s ease;
+}
+
+body.cp-theme .cy-panzoom-zoom-button:hover,
+body.cp-theme .cy-panzoom-reset:hover {
+	background: var(--cp-sidebar);
+	color: var(--cp-accent-text);
+	border-color: var(--cp-drop-border);
+}
+
+body.cp-theme .cy-panzoom-slider-background {
+	background: var(--cp-card-border);
+	border-left: none;
+	border-right: none;
+	border-radius: 3px;
+	width: 4px;
+	left: 4px;
+}
+
+body.cp-theme .cy-panzoom-slider-handle {
+	background: var(--cp-accent);
+	border: none;
+	border-radius: 999px;
+	box-shadow: var(--cp-shadow-float);
+}
+
+/* .cy-panzoom-panner-handle is the full-size transparent drag target over the
+   panner — it must stay transparent. the dot that tracks the drag is
+   .cy-panzoom-pan-indicator. */
+body.cp-theme .cy-panzoom-pan-indicator {
+	background: var(--cp-accent);
+}
+
+/* --------------------------------------------------------- inspector --- */
+
+body.cp-theme #sbgn-inspector > .nav-tabs {
+	display: flex;
+	flex: none;
+	margin: 0;
+	border: none;
+	border-bottom: 1px solid var(--cp-border);
+	background: var(--cp-bg);
+}
+
+body.cp-theme #sbgn-inspector > .nav-tabs > li {
+	flex: 1;
+	float: none;
+	margin: 0;
+}
+
+body.cp-theme .chise-tab a {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 12px 6px !important;
+	margin: 0;
+	border: none !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	font-family: var(--cp-serif);
+	font-size: 13.5px;
+	font-weight: 500;
+	color: var(--cp-faint);
+	transition: 0.15s ease;
+}
+
+body.cp-theme .chise-tab a img {
+	width: 15px !important;
+	height: 15px !important;
+	opacity: 0.6;
+}
+
+body.cp-theme .chise-tab:hover a {
+	background: transparent !important;
+	color: var(--cp-nav);
+}
+
+body.cp-theme .chise-tab.active a {
+	background: transparent !important;
+	color: var(--cp-accent-text);
+	font-weight: 600;
+	box-shadow: inset 0 -2px 0 var(--cp-accent);
+}
+
+body.cp-theme .chise-tab.active a img {
+	opacity: 1;
+}
+
+body.cp-theme #sbgn-inspector > .tab-content {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+	padding: 14px;
+}
+
+/* accordion sections */
+body.cp-theme #sbgn-inspector .panel-group {
+	margin: 0;
+}
+
+body.cp-theme #sbgn-inspector .panel {
+	border: none;
+	background: transparent;
+	box-shadow: none;
+	margin: 0 0 8px;
+}
+
+body.cp-theme #sbgn-inspector .panel-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: auto;
+	padding: 9px 12px;
+	margin: 0;
+	text-align: left;
+	background: var(--cp-hover);
+	border: none;
+	border-radius: 8px;
+	transition: 0.15s ease;
+}
+
+body.cp-theme #sbgn-inspector .panel-heading.collapsed {
+	background: var(--cp-surface);
+	border: 1px solid var(--cp-card-border);
+	padding: 9px 11px;
+}
+
+body.cp-theme #sbgn-inspector .panel-heading.collapsed:hover {
+	border-color: var(--cp-accent);
+}
+
+body.cp-theme #sbgn-inspector .panel-title {
+	font-family: var(--cp-serif);
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--cp-text);
+	margin: 0;
+	width: 100%;
+}
+
+body.cp-theme #sbgn-inspector .accordion-toggle:after {
+	color: var(--cp-faint);
+	font-size: 10px;
+	padding-right: 0;
+}
+
+body.cp-theme #sbgn-inspector .panel-body {
+	padding: 12px 2px 4px !important;
+	background: transparent;
+	border: none !important;
+}
+
+/* form rows */
+body.cp-theme #sbgn-inspector td,
+body.cp-theme #sbgn-inspector .inspector-input-box {
+	font-family: var(--cp-sans);
+	font-size: 12px !important;
+	color: var(--cp-muted);
+	vertical-align: middle;
+}
+
+body.cp-theme #sbgn-inspector .map-panel-table td.header,
+body.cp-theme #sbgn-inspector .object-panel-table td:first-child {
+	color: var(--cp-muted);
+	line-height: 1.35;
+}
+
+body.cp-theme #sbgn-inspector .table-condensed th,
+body.cp-theme #sbgn-inspector .table-condensed td {
+	padding: 5px;
+	border: none;
+}
+
+body.cp-theme #sbgn-inspector .property-table {
+	border: none;
+	margin: 0;
+}
+
+body.cp-theme #sbgn-inspector hr.inspector-divider {
+	border-top-color: var(--cp-card-border);
+}
+
+/* index.css hides textarea overflow globally; in the inspector that clips the
+   map description, so let it scroll here */
+body.cp-theme #sbgn-inspector textarea {
+	overflow: auto;
+}
+
+/* --------------------------------------------------- shared controls --- */
+
+/* note the [type=file] exclusion: .file-picker inputs are invisible full-size
+   overlays on the dropzones, so they must not pick up any box styling */
+body.cp-theme input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+body.cp-theme select,
+body.cp-theme textarea {
+	font-family: var(--cp-sans);
+	font-size: 12px !important;
+	color: var(--cp-text);
+	background-color: var(--cp-surface);
+	border: 1px solid #ded4c2;
+	border-radius: 7px;
+	padding: 4px 8px;
+	height: 28px;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.cp-theme textarea {
+	height: auto;
+	resize: none;
+}
+
+body.cp-theme input.file-picker {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	border: none;
+	background: transparent;
+}
+
+body.cp-theme input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):focus,
+body.cp-theme select:focus,
+body.cp-theme textarea:focus {
+	border-color: var(--cp-accent);
+	box-shadow: 0 0 0 3px rgba(212, 87, 58, 0.14);
+	outline: none;
+}
+
+body.cp-theme input[type='checkbox'],
+body.cp-theme input[type='radio'] {
+	width: 16px !important;
+	height: 16px;
+	accent-color: var(--cp-accent);
+}
+
+body.cp-theme input[type='range'] {
+	accent-color: var(--cp-accent);
+	height: auto;
+	padding: 0;
+	border: none;
+	background: transparent;
+}
+
+body.cp-theme input[type='color'] {
+	padding: 2px;
+	height: 26px;
+}
+
+body.cp-theme .btn,
+body.cp-theme .btn-default {
+	font-family: var(--cp-sans);
+	font-size: 12px !important;
+	font-weight: 600;
+	color: var(--cp-accent-text);
+	background: var(--cp-surface);
+	border: 1px solid var(--cp-accent) !important;
+	border-radius: 8px !important;
+	padding: 6px 16px;
+	box-shadow: none;
+	transition: 0.15s ease;
+}
+
+body.cp-theme .btn:hover,
+body.cp-theme .btn-default:hover,
+body.cp-theme .btn:focus,
+body.cp-theme .btn-default:focus {
+	background: var(--cp-tint);
+	color: var(--cp-accent-text);
+	border-color: var(--cp-accent) !important;
+}
+
+body.cp-theme .btn-primary {
+	background: var(--cp-accent);
+	color: #fff;
+	border-color: var(--cp-accent) !important;
+}
+
+body.cp-theme .btn-primary:hover,
+body.cp-theme .btn-primary:focus {
+	background: var(--cp-accent-hover);
+	color: #fff;
+}
+
+/* network tabs strip under the canvas */
+body.cp-theme #network-tabs-list-container {
+	width: 100% !important;
+	margin: 0;
+	padding: 0 12px;
+	background: var(--cp-sidebar);
+	border-top: 1px solid var(--cp-border);
+	flex: none;
+}
+
+body.cp-theme #network-tabs-list-container:empty,
+body.cp-theme #network-tabs-list:empty {
+	padding: 0;
+}
+
+body.cp-theme .chise-network-tab a {
+	font-family: var(--cp-mono);
+	font-size: 11px;
+	color: var(--cp-muted);
+	border: none !important;
+	border-radius: 0 0 8px 8px !important;
+	background: transparent !important;
+}
+
+body.cp-theme .chise-network-tab.active a {
+	background: var(--cp-surface) !important;
+	color: var(--cp-accent-text);
+}
+
+/* ----------------------------------------------- menus, modals, tips --- */
+
+body.cp-theme .cy-context-menus-cxt-menu {
+	background: var(--cp-surface);
+	border: 1px solid var(--cp-border);
+	border-radius: 11px;
+	box-shadow: 0 8px 24px rgba(90, 70, 40, 0.16);
+	padding: 6px;
+	overflow: hidden;
+}
+
+body.cp-theme .cy-context-menus-cxt-menuitem {
+	background: transparent;
+	color: var(--cp-text-2);
+	font-family: var(--cp-sans);
+	font-size: 12.5px;
+	border: none;
+	border-radius: 7px;
+	padding: 7px 10px;
+}
+
+body.cp-theme .cy-context-menus-cxt-menuitem:enabled:hover {
+	background: var(--cp-chip);
+	color: var(--cp-accent-text);
+}
+
+body.cp-theme .cy-context-menus-divider {
+	border-bottom: 1px solid var(--cp-hairline);
+}
+
+/* jstree right-click menu */
+body.cp-theme .vakata-context,
+body.cp-theme .vakata-context ul {
+	background: var(--cp-surface);
+	border: 1px solid var(--cp-border);
+	border-radius: 11px;
+	box-shadow: 0 8px 24px rgba(90, 70, 40, 0.16);
+	padding: 6px;
+}
+
+body.cp-theme .vakata-context li > a {
+	font-family: var(--cp-sans);
+	font-size: 12.5px;
+	color: var(--cp-text-2);
+	border-radius: 7px;
+	padding: 6px 10px;
+	text-shadow: none;
+}
+
+body.cp-theme .vakata-context li > a:hover,
+body.cp-theme .vakata-context .vakata-context-hover > a {
+	background: var(--cp-chip) !important;
+	color: var(--cp-accent-text) !important;
+	box-shadow: none;
+	text-shadow: none;
+}
+
+body.cp-theme .vakata-context li > a > i {
+	display: none;
+}
+
+body.cp-theme .vakata-context li > a .vakata-contextmenu-sep {
+	display: none;
+}
+
+/* bootstrap modals */
+body.cp-theme .modal-content {
+	background: var(--cp-surface);
+	border: 1px solid var(--cp-border);
+	border-radius: 14px;
+	box-shadow: 0 18px 48px rgba(90, 70, 40, 0.22);
+}
+
+body.cp-theme .sbgn-modal-dialog .modal-header,
+body.cp-theme .modal-header {
+	background-color: var(--cp-sidebar) !important;
+	color: var(--cp-text) !important;
+	border-bottom: 1px solid var(--cp-border);
+	border-radius: 14px 14px 0 0;
+	font-family: var(--cp-serif);
+}
+
+body.cp-theme .modal-header .close {
+	color: var(--cp-nav);
+	opacity: 0.6;
+	text-shadow: none;
+}
+
+body.cp-theme .modal-footer {
+	border-top: 1px solid var(--cp-hairline);
+}
+
+body.cp-theme .sbgn-frame {
+	border: 1px solid var(--cp-border);
+	border-radius: 10px;
+	padding-bottom: 10px;
+}
+
+body.cp-theme .sbgn-text {
+	font-family: var(--cp-serif);
+	color: var(--cp-accent-text);
+	font-weight: 600;
+}
+
+body.cp-theme .address-text {
+	font-family: var(--cp-sans);
+	color: var(--cp-muted);
+}
+
+body.cp-theme #about-newt-version {
+	color: var(--cp-accent-text) !important;
+}
+
+body.cp-theme .thin-blue-border {
+	border: 1px solid var(--cp-border);
+	border-radius: 7px;
+}
+
+body.cp-theme .thin-grey-border {
+	border: 1px solid var(--cp-border);
+	border-radius: 7px;
+}
+
+/* qtip / draggable experiment panel */
+body.cp-theme .qtip-bootstrap {
+	border: 1px solid var(--cp-tint-border);
+	border-radius: 10px;
+}
+
+body.cp-theme .qtip-bootstrap .qtip-titlebar {
+	background-color: var(--cp-tint);
+	color: var(--cp-tint-text);
+	font-family: var(--cp-serif);
+}
+
+body.cp-theme #draggable-exp-data-div {
+	background-color: var(--cp-surface);
+	border: 1px solid var(--cp-border);
+	border-radius: 11px;
+	box-shadow: var(--cp-shadow-float);
+	overflow: hidden;
+}
+
+body.cp-theme #draggable-exp-data-div-header {
+	background-color: var(--cp-accent) !important;
+	border: none;
+	border-radius: 0;
+	font-family: var(--cp-serif);
+	font-weight: 600;
+}
+
+body.cp-theme .table-hover tbody tr:hover td,
+body.cp-theme .table-hover tbody tr:hover th {
+	background-color: var(--cp-hover);
+}
+
+/* node label editor floating over the canvas */
+body.cp-theme #node-label-textbox {
+	border-radius: 7px;
+	border: 1px solid var(--cp-accent);
+	font-family: var(--cp-mono);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.cp-theme * {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+	}
+}

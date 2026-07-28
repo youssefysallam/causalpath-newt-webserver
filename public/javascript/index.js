@@ -424,6 +424,9 @@ function generateJSTree(treeHierarchy) {
 }
 
 function showChoosingMenus() {
+    // the theme drives landing-vs-workspace off this class; the inline styles
+    // below stay so the app still works with the theme stylesheet removed
+    document.body.classList.remove("cp-view-graph");
     document.getElementById("menu-text-buttons").style.display = "block";
     document.getElementById("folder-trees-graphs").style.display = "none";
     document.getElementById("back_menu").style.display = "none";
@@ -432,6 +435,7 @@ function showChoosingMenus() {
 }
 
 function showGraphAndFolders() {
+    document.body.classList.add("cp-view-graph");
     document.getElementById("menu-text-buttons").style.display = "none";
     document.getElementById("folder-trees-graphs").style.display = "block";
     document.getElementById("back_menu").style.display = "block";

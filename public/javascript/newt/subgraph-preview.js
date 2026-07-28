@@ -6,6 +6,8 @@ var $ = require('jquery');
 var chise = require('chise');
 var subgraphUtils = require('./subgraph-utils');
 var mainCanvasLoad = require('./main-canvas-load');
+var subgraphIndicator = require('./subgraph-indicator');
+var cpGraphTheme = require('./cp-graph-theme');
 
 var PANEL_ID = 'subgraph-preview-panel';
 var STYLE_ID = 'subgraph-preview-styles';
@@ -196,17 +198,31 @@ function applyGrouping(instance) {
 
 // load the subgraph into the active (main) instance, replacing the current graph.
 // goes through the styled canvas loader so it gets colors + grouping too.
-function promote(subSif, fileName, format) {
+//
+// promoting lands the user on exactly the graph the "load subgraph" menu item
+// produces, so it also raises the seed-gene badge above the file tree — the
+// canvas is a subgraph either way and has to stay editable the same way. that
+// needs the FULL sif (not the filtered one) to re-filter against as chips change.
+function promote(subSif, fileName, format, genes, fullSif) {
     if (!window.confirm('Load this subgraph into the main canvas? This replaces the current graph.')) {
         return;
     }
     mainCanvasLoad.loadStyledSifToCanvas(subSif, format, fileName);
+    if (genes && genes.length && fullSif) {
+        subgraphIndicator.show({
+            fullSif: fullSif, format: format, fileName: fileName, seeds: genes.slice(),
+        });
+    } else {
+        subgraphIndicator.hide();
+    }
     destroy();
 }
 
 // build + show the panel and render the filtered sif in its own mini instance.
 // formatText (optional) drives node/edge colors from the .sif ".format" file.
-function open(subSif, fileName, genes, formatText) {
+// fullSif is the unfiltered graph, carried through so promote() can hand it to
+// the seed-gene badge.
+function open(subSif, fileName, genes, formatText, fullSif) {
     injectStyles();
     destroy(); // drop any previous preview first
 
@@ -218,6 +234,11 @@ function open(subSif, fileName, genes, formatText) {
     var instance = chise({ networkContainerSelector: '#' + CY_ID, undoable: false });
     current.instance = instance;
     var cy = instance.getCy();
+
+    // this cy is created directly rather than through appUtilities.createNewNetwork,
+    // so the theme's cytoscape layer doesn't reach it automatically. apply it here
+    // so the preview renders with the same node typography as the main canvas.
+    cpGraphTheme.apply(cy);
 
     // init expand-collapse on this cy so the topology grouping's lock/unlock cue
     // calls (cy.expandCollapse('get')...) don't crash on an uninitialized extension
@@ -250,7 +271,7 @@ function open(subSif, fileName, genes, formatText) {
     wireResize($panel, cy);
     $panel.find('.subgraph-preview-close').on('click', destroy);
     $panel.find('.subgraph-preview-promote').on('click', function () {
-        promote(subSif, fileName, formatText);
+        promote(subSif, fileName, formatText, genes, fullSif);
     });
 
     // div is in the dom now -> make sure cy picks up its real size

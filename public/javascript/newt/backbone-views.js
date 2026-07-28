@@ -6589,8 +6589,10 @@ var LoadSubgraphView = Backbone.View.extend({
                 subgraphIndicator.hide();
             }
         } else {
-            // render in the floating preview panel (format drives node colors)
-            subgraphPreview.open(subSif, this.fileName, valid, this.format);
+            // render in the floating preview panel (format drives node colors).
+            // the full sif rides along so "promote to main canvas" can raise the
+            // same editable seed-gene badge the canvas mode does.
+            subgraphPreview.open(subSif, this.fileName, valid, this.format, this.sifText);
         }
         $(this.el).modal('hide');
     },

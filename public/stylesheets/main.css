@@ -1,3 +1,6 @@
+/* note: the CausalPath theme is NOT imported here on purpose — it has to be the
+   last stylesheet the page loads, so it ships as its own <link> after this
+   bundle in views/index.html. see public/stylesheets/causalpath-theme.css */
 @import "./index.css";
 
 @import "cytoscape-context-menus";

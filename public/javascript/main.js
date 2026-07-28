@@ -59,14 +59,24 @@ libs.cytoscape = cytoscape;
 libs.sbgnviz = sbgnviz;
 libs.tippy = tippy;
 
+const cpGraphTheme = require('./newt/cp-graph-theme');
+const cpChrome = require('./newt/cp-chrome');
+
 $(document).ready(function () {
 	// Register chise with libs
 	chise.register(libs);
 
 	appMenu();
 
+	// theme layer 2: append node/edge styles to the cytoscape stylesheet.
+	// installed before the first network so it catches every instance.
+	cpGraphTheme();
+
 	// create a new network and access the related chise.js instance
 	appUtilities.createNewNetwork();
+
+	// workspace chrome labels (file name + counts) — reads newt, never writes it
+	cpChrome();
 
 	// launch with model file if exists
 	// appUtilities.launchWithModelFile();

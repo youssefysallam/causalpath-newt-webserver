@@ -11,11 +11,16 @@ var mainCanvasLoad = require('./main-canvas-load');
 var CONTAINER_ID = 'subgraph-indicator-container';
 var STYLE_ID = 'subgraph-indicator-styles';
 
-// null when inactive, else { fullSif, format, fileName, seeds:[], geneSet }
+// null when inactive, else { fullSif, format, fileName, seeds:[], geneSet, genes }
 var state = null;
 var expanded = false;
 var note = ''; // transient message shown under the add-genes input
 var focusInput = false; // refocus the add-genes input after the next render
+
+// autocomplete: names currently offered, and which one arrow keys have landed on
+var suggestions = [];
+var activeSuggestion = -1;
+var MAX_SUGGESTIONS = 8;
 
 // scoped styles, injected once (no css build, same trick as subgraph-preview)
 function injectStyles() {
@@ -43,6 +48,12 @@ function injectStyles() {
         'color:#fff;border-radius:3px;padding:2px 8px;cursor:pointer;font-size:12px;}',
         '.subgraph-indicator-add:hover{background:#215aa0;}',
         '.subgraph-indicator-note{margin-top:3px;color:#c0392b;min-height:0;}',
+        '.subgraph-indicator-suggestions{margin-top:3px;border:1px solid #b9c6d6;',
+        'border-radius:3px;background:#fff;max-height:132px;overflow-y:auto;}',
+        '.subgraph-indicator-suggestions:empty{display:none;border:0;}',
+        '.subgraph-indicator-suggestion{padding:3px 6px;cursor:pointer;}',
+        '.subgraph-indicator-suggestion:hover,',
+        '.subgraph-indicator-suggestion.active{background:#e9f0f7;}',
     ].join('');
     var style = document.createElement('style');
     style.id = STYLE_ID;
@@ -74,21 +85,79 @@ function render() {
         }).join('');
         html += '<div class="subgraph-indicator-body">' + chips +
             '<div class="subgraph-indicator-add-row">' +
-            '<input type="text" class="subgraph-indicator-input" placeholder="add gene(s)…">' +
+            '<input type="text" class="subgraph-indicator-input" placeholder="add gene(s)…" ' +
+            'autocomplete="off" spellcheck="false">' +
             '<button type="button" class="subgraph-indicator-add">Add</button>' +
             '</div>' +
+            '<div class="subgraph-indicator-suggestions"></div>' +
             '<div class="subgraph-indicator-note">' + _escape(note) + '</div>' +
             '<div><span class="subgraph-indicator-full">Show full graph</span></div>' +
             '</div>';
     }
     html += '</div>';
     $c.html(html);
+    // a re-render replaces the input, so any open suggestion list is gone with it
+    suggestions = [];
+    activeSuggestion = -1;
     // keep focus in the input across the re-render so the user can keep typing
     if (expanded && focusInput) {
         var el = $c.find('.subgraph-indicator-input')[0];
         if (el) el.focus();
     }
     focusInput = false;
+}
+
+// genes are typed one per entry or as a comma/space separated list, so complete
+// against the token being typed rather than the whole field
+function currentToken(value) {
+    var parts = String(value == null ? '' : value).split(/[\s,;|]+/);
+    return parts[parts.length - 1] || '';
+}
+
+// replace the token under the cursor with a picked name, keeping earlier ones
+function replaceCurrentToken(value, name) {
+    var v = String(value == null ? '' : value);
+    var m = v.match(/[\s,;|]*[^\s,;|]*$/);
+    return v.slice(0, v.length - (m ? m[0].length : 0)) + (v.trim() ? ', ' : '') + name;
+}
+
+// prefix match on genes present in the full graph, minus the ones already seeded
+function computeSuggestions(query) {
+    var q = String(query || '').trim().toLowerCase();
+    if (!state || !q) return [];
+    return state.genes.filter(function (g) {
+        return g.toLowerCase().indexOf(q) === 0 && state.seeds.indexOf(g) === -1;
+    }).slice(0, MAX_SUGGESTIONS);
+}
+
+// repaint just the dropdown — a full render() would blow away what's being typed
+function renderSuggestions(value) {
+    var $c = $container();
+    var $box = $c.find('.subgraph-indicator-suggestions');
+    if (!$box.length) return;
+    suggestions = computeSuggestions(currentToken(value));
+    activeSuggestion = -1;
+    $box.html(suggestions.map(function (g) {
+        return '<div class="subgraph-indicator-suggestion" data-gene="' + _escape(g) + '">' +
+            _escape(g) + '</div>';
+    }).join(''));
+}
+
+function closeSuggestions() {
+    suggestions = [];
+    activeSuggestion = -1;
+    $container().find('.subgraph-indicator-suggestions').empty();
+}
+
+function highlightSuggestion(delta) {
+    if (!suggestions.length) return;
+    activeSuggestion = (activeSuggestion + delta + suggestions.length) % suggestions.length;
+    var $items = $container().find('.subgraph-indicator-suggestion');
+    $items.removeClass('active');
+    var $active = $items.eq(activeSuggestion).addClass('active');
+    if ($active.length && $active[0].scrollIntoView) {
+        $active[0].scrollIntoView({block: 'nearest'});
+    }
 }
 
 // minimal html escaper (gene names are simple, but stay safe)
@@ -172,11 +241,41 @@ function wireEvents() {
         var $input = $c.find('.subgraph-indicator-input');
         addFromText($input.val());
     });
+    $c.on('input', '.subgraph-indicator-input', function () {
+        renderSuggestions(this.value);
+    });
     $c.on('keydown', '.subgraph-indicator-input', function (e) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            if (!suggestions.length) return;
+            e.preventDefault();
+            highlightSuggestion(e.key === 'ArrowDown' ? 1 : -1);
+            return;
+        }
+        if (e.key === 'Escape') {
+            if (suggestions.length) e.stopPropagation();
+            closeSuggestions();
+            return;
+        }
         if (e.key === 'Enter') {
             e.preventDefault();
-            addFromText(this.value);
+            // Enter takes the highlighted suggestion if the user arrowed to one,
+            // otherwise it just submits whatever they typed
+            if (activeSuggestion >= 0 && suggestions[activeSuggestion]) {
+                addFromText(replaceCurrentToken(this.value, suggestions[activeSuggestion]));
+            } else {
+                addFromText(this.value);
+            }
         }
+    });
+    $c.on('mousedown', '.subgraph-indicator-suggestion', function (e) {
+        // mousedown, not click: the input's blur would tear the list down first
+        e.preventDefault();
+        e.stopPropagation();
+        var $input = $c.find('.subgraph-indicator-input');
+        addFromText(replaceCurrentToken($input.val(), $(this).attr('data-gene')));
+    });
+    $c.on('blur', '.subgraph-indicator-input', function () {
+        setTimeout(closeSuggestions, 120);
     });
 }
 
@@ -189,16 +288,21 @@ function show(opts) {
     }
     injectStyles();
     var fullSif = opts.fullSif || '';
+    // gene names present in the full graph: the set validates typed additions,
+    // the sorted list backs the autocomplete
+    var genes = subgraphUtils.parseSifGenes(fullSif).genes;
     state = {
         fullSif: fullSif,
         format: opts.format || '',
         fileName: opts.fileName || '',
         seeds: opts.seeds.slice(),
-        // gene names present in the full graph, for validating typed additions
-        geneSet: new Set(subgraphUtils.parseSifGenes(fullSif).genes),
+        geneSet: new Set(genes),
+        genes: genes,
     };
     expanded = false;
     note = '';
+    suggestions = [];
+    activeSuggestion = -1;
     wireEvents();
     render();
 }
@@ -207,6 +311,8 @@ function hide() {
     state = null;
     expanded = false;
     note = '';
+    suggestions = [];
+    activeSuggestion = -1;
     $container().empty();
 }
 
