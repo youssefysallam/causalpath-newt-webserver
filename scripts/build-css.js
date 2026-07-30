@@ -58,7 +58,10 @@ function fail(err) {
 if (process.argv.includes('--watch')) {
 	build().catch(fail);
 	let pending = null;
-	fs.watch(WATCH_DIR, { recursive: true }, () => {
+	// NB: no { recursive: true }. Node only supports recursive watching on macOS
+	// and Windows before v20 — on Linux it throws ERR_FEATURE_UNAVAILABLE_ON_PLATFORM.
+	// public/stylesheets is flat, so a plain directory watch covers every file.
+	fs.watch(WATCH_DIR, () => {
 		clearTimeout(pending); // editors fire several events per save
 		pending = setTimeout(() => build().catch(fail), 80);
 	});
