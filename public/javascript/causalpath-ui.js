@@ -90,6 +90,33 @@
 
 	/* ------------------------------------------------- landing: demo chips */
 
+	// Clicking a demo used to only build the file tree, leaving the canvas empty
+	// until you found the same file in the sidebar and double-clicked it. The
+	// tree is populated asynchronously, so wait for the row to exist and then
+	// double-click it — that's the one code path newt has for opening a file,
+	// and reusing it means .nwt/.sif both load exactly as they normally would.
+	function openInTreeWhenReady(fileName) {
+		var deadline = Date.now() + 20000;
+
+		(function attempt() {
+			var rows = document.querySelectorAll("#folder-tree-container .jstree-anchor");
+			for (var i = 0; i < rows.length; i++) {
+				if (rows[i].textContent.trim() === fileName) {
+					rows[i].scrollIntoView({block: "nearest"});
+					["mousedown", "mouseup", "click", "dblclick"].forEach(function (type) {
+						rows[i].dispatchEvent(
+							new MouseEvent(type, {bubbles: true, cancelable: true, view: window, detail: 2})
+						);
+					});
+					return;
+				}
+			}
+			// the tree isn't built yet (or the name isn't in it) — keep looking
+			// until the deadline, then give up quietly and leave the tree usable
+			if (Date.now() < deadline) setTimeout(attempt, 150);
+		})();
+	}
+
 	// one chip per bundled sample. clicking any of them runs the existing demo
 	// flow by proxying to #display-demo-graphs, whose handler index.js owns.
 	function loadDemoChips() {
@@ -136,7 +163,8 @@
 					chip.appendChild(dot);
 					chip.appendChild(text);
 					chip.addEventListener("click", function () {
-						trigger.click();
+						trigger.click(); // existing flow: fetch the list, build the tree
+						openInTreeWhenReady(name); // then open the one they actually picked
 					});
 					grid.appendChild(chip);
 				});
@@ -154,6 +182,15 @@
 					});
 				}
 			});
+	}
+
+	/* ---------------------------------------------- graph: toolbar search */
+
+	// newt ships this input with no placeholder, which left it reading as blank
+	// toolbar space. an attribute only — the field and its handlers are newt's.
+	var searchBox = document.getElementById("search-by-label-text-box");
+	if (searchBox && !searchBox.getAttribute("placeholder")) {
+		searchBox.setAttribute("placeholder", "Search…");
 	}
 
 	/* ------------------------------------------------ graph: tree tooltips */

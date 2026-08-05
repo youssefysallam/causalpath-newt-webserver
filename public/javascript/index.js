@@ -38,15 +38,19 @@ let handleResponse = (res, afterResolve, handleRequestError, getResData) => {
 let graphChoice = graphChoiceEnum.ANALYSIS;
 
 /**
- * Right-click context menu items for file-tree nodes. "Graph Statistics" is
- * enabled for .sif graph files and greyed out for folders and other file
- * types. The stats are computed inside the newt bundle (it needs appUtilities,
- * which this plain script can't see), exposed as window.newtShowGraphStatistics.
- * This menu is also where the upcoming subgraph/quick-preview actions will live.
+ * Right-click context menu items for file-tree nodes. Only .sif files get a
+ * menu at all — see the guard below. The actions are computed inside the newt
+ * bundle (they need appUtilities, which this plain script can't see) and are
+ * exposed on window as newtOpenFile / newtLoadSubgraph* / newtShowGraphStatistics.
  */
 function treeContextMenuItems(node) {
     let name = (node && (node.text || (node.data && node.data.name))) || "";
     let isSif = name.endsWith(".sif");
+
+    // Every item here reads the file as SIF text. On a .nwt (the demo graphs) or
+    // a folder they'd throw, so suppress the menu entirely rather than show a
+    // list of greyed-out entries. Returning false stops jstree opening one.
+    if (!isSif) return false;
 
     // the sibling ".format" node (if any) carries node colors/infoboxes for
     // client-uploaded .sif files; analyzed files bundle it in their content.
@@ -59,7 +63,6 @@ function treeContextMenuItems(node) {
     return {
         open: {
             label: "Open",
-            _disabled: !isSif,
             action: function (data) {
                 let instance = $.jstree.reference(data.reference);
                 let targetNode = instance.get_node(data.reference);
@@ -70,7 +73,6 @@ function treeContextMenuItems(node) {
         },
         loadSubgraph: {
             label: "Load Subgraph...",
-            _disabled: !isSif,
             action: function (data) {
                 let instance = $.jstree.reference(data.reference);
                 let targetNode = instance.get_node(data.reference);
@@ -81,7 +83,6 @@ function treeContextMenuItems(node) {
         },
         loadSubgraphOverlay: {
             label: "Load Subgraph (overlay)...",
-            _disabled: !isSif,
             action: function (data) {
                 let instance = $.jstree.reference(data.reference);
                 let targetNode = instance.get_node(data.reference);
@@ -92,7 +93,6 @@ function treeContextMenuItems(node) {
         },
         graphStatistics: {
             label: "Graph Statistics",
-            _disabled: !isSif,
             action: function (data) {
                 let instance = $.jstree.reference(data.reference);
                 let targetNode = instance.get_node(data.reference);
@@ -102,6 +102,33 @@ function treeContextMenuItems(node) {
             },
         },
     };
+}
+
+/**
+ * Icon for a file row in the tree. A quiet document mark rather than the
+ * CausalPath logo — the logo repeated down every row read as branding noise and
+ * competed with the file names for attention. Graph files (.sif/.nwt) get a
+ * faint accent fold so they still stand apart from sidecar files at a glance.
+ */
+const TREE_ICON_GRAPH =
+    "data:image/svg+xml;charset=utf-8," +
+    encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" ' +
+        'stroke="#a89a83" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M9.5 1.8H4.2v12.4h7.6V4.1z"/><path d="M9.5 1.8v2.3h2.3" stroke="#d09a3e"/></svg>'
+    );
+const TREE_ICON_PLAIN =
+    "data:image/svg+xml;charset=utf-8," +
+    encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" ' +
+        'stroke="#c2b6a0" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M9.5 1.8H4.2v12.4h7.6V4.1z"/><path d="M9.5 1.8v2.3h2.3"/></svg>'
+    );
+
+function fileTreeIcon(name) {
+    if (/\.(sif|nwt)$/i.test(name)) return TREE_ICON_GRAPH;
+    if (/\.(format|json)$/i.test(name)) return TREE_ICON_PLAIN;
+    return "";
 }
 
 /** Enable the jsTree context-menu plugin on a tree config (in place). */
@@ -139,11 +166,7 @@ function buildFolderTree(paths, treeNode, file, parentNodePath = "") {
         data: file,
     };
 
-    if (newNode.text.endsWith(".nwt")) newNode.icon = "./img/tree-newt-icon.png";
-    else if (newNode.text.endsWith(".sif")) newNode.icon = "./img/tree-sif-icon.png";
-    else if (newNode.text.endsWith(".format")) newNode.icon = "./img/tree-sif-icon.png";
-    else if (newNode.text.endsWith(".json")) newNode.icon = "./img/tree-json-icon.png";
-    else newNode.icon = "";
+    newNode.icon = fileTreeIcon(newNode.text);
 
     treeNode.push(newNode);
     buildFolderTree(paths.splice(1, paths.length), newNode.children, file, nodeId);
@@ -340,11 +363,7 @@ function buildTreeHierarchyAnalyzedFiles(rootDirName, fileList) {
             },
         };
 
-        if (newNode.text.endsWith(".nwt")) newNode.icon = "./img/tree-newt-icon.png";
-        else if (newNode.text.endsWith(".sif")) newNode.icon = "./img/tree-sif-icon.png";
-        else if (newNode.text.endsWith(".format")) newNode.icon = "./img/tree-sif-icon.png";
-        else if (newNode.text.endsWith(".json")) newNode.icon = "./img/tree-json-icon.png";
-        else newNode.icon = "";
+        newNode.icon = fileTreeIcon(newNode.text);
 
         data.push(newNode);
     });
@@ -380,11 +399,7 @@ function buildTreeHierarchySampleFiles(dirsList) {
             },
         };
 
-        if (newNode.text.endsWith(".nwt")) newNode.icon = "./img/tree-newt-icon.png";
-        else if (newNode.text.endsWith(".sif")) newNode.icon = "./img/tree-sif-icon.png";
-        else if (newNode.text.endsWith(".format")) newNode.icon = "./img/tree-sif-icon.png";
-        else if (newNode.text.endsWith(".json")) newNode.icon = "./img/tree-json-icon.png";
-        else newNode.icon = "";
+        newNode.icon = fileTreeIcon(newNode.text);
 
         data.push(newNode);
     });

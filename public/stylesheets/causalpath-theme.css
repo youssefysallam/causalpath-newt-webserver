@@ -287,53 +287,6 @@ body.cp-theme .cp-btn-block {
 	margin: 0;
 }
 
-.cp-stepper {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	font-family: var(--cp-mono);
-	font-size: 11px;
-	color: var(--cp-faint);
-}
-
-.cp-step {
-	display: flex;
-	align-items: center;
-	gap: 5px;
-}
-
-.cp-step-num {
-	width: 18px;
-	height: 18px;
-	border-radius: 50%;
-	display: grid;
-	place-items: center;
-	font-size: 10px;
-	font-weight: 700;
-	background: var(--cp-sidebar);
-	border: 1px solid #d9cfbb;
-}
-
-.cp-step-sep {
-	color: #cabfa8;
-}
-
-.cp-step.is-done .cp-step-num {
-	background: var(--cp-accent);
-	border-color: var(--cp-accent);
-	color: #fff;
-}
-
-.cp-step.is-current {
-	color: var(--cp-accent-text);
-	font-weight: 600;
-}
-
-.cp-step.is-current .cp-step-num {
-	background: var(--cp-chip);
-	border-color: var(--cp-accent);
-}
-
 /* --- segmented control --- */
 
 .cp-seg {
@@ -1275,7 +1228,9 @@ body.cp-theme #sbgn-toolbar .menu-break-small {
 	display: none;
 }
 
-body.cp-theme #sbgn-toolbar .sbgn-toolbar-element {
+/* square icon buttons. the search input carries this class too but is a text
+   field, not a button — excluded so it keeps its own width and padding. */
+body.cp-theme #sbgn-toolbar .sbgn-toolbar-element:not(#search-by-label-text-box) {
 	float: none;
 	margin: 0;
 	padding: 0 !important;
@@ -1379,25 +1334,36 @@ body.cp-theme #sbgn-toolbar .inside-menu:has(#search-by-label-text-box) {
 	gap: 5px;
 }
 
-body.cp-theme #search-by-label-text-box {
-	width: 110px;
+/* this needs to read as a text field on sight. borderless-on-a-pale-pod made it
+   look like empty toolbar space until you clicked in it, so give it its own
+   inset well the way the pre-redesign toolbar did. */
+/* NB: the input also carries newt's .sbgn-toolbar-element class, so the 30px
+   icon-button rule above outranks a plain #id selector. Scoping through
+   #sbgn-toolbar gives this two ids and wins; flex:none stops the pod squashing
+   it back down to the icon width. */
+body.cp-theme #sbgn-toolbar #search-by-label-text-box {
+	flex: none;
+	width: 132px;
 	height: 26px;
-	border: none;
-	border-radius: 0;
-	background: transparent;
+	border: 1px solid #d7cbb6;
+	border-radius: 6px;
+	background: #fffdfa;
+	box-shadow: inset 0 1px 2px rgba(90, 70, 40, 0.06);
 	font-family: var(--cp-sans);
 	font-size: 12.5px !important;
 	color: var(--cp-text);
-	padding-left: 2px;
+	padding: 0 8px;
 	outline-offset: 0;
 }
 
-body.cp-theme #search-by-label-text-box::placeholder {
+body.cp-theme #sbgn-toolbar #search-by-label-text-box::placeholder {
 	color: var(--cp-faint);
+	opacity: 1;
 }
 
-body.cp-theme #search-by-label-text-box:focus {
-	box-shadow: none;
+body.cp-theme #sbgn-toolbar #search-by-label-text-box:focus {
+	border-color: var(--cp-accent);
+	box-shadow: 0 0 0 3px rgba(212, 87, 58, 0.14);
 	outline: none;
 }
 

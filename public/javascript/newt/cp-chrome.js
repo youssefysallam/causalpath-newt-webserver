@@ -26,15 +26,62 @@ function activeCy() {
     }
 }
 
-// compound parents are grouping containers newt adds for sif topology grouping,
-// not genes -> count the leaves so the number matches what the user sees
+// Newt tags the compounds it creates for sif topology grouping with this class.
+// Only those stand in for several relations; an SBGN complex or compartment in a
+// hand-drawn map is a real biological container and must NOT be expanded, or the
+// count balloons.
+var TOPOLOGY_GROUP = 'topology group';
+
+function isTopologyGroup(node) {
+    return node.data('class') === TOPOLOGY_GROUP;
+}
+
+// how many real genes a node stands for: 1 for anything ordinary, or the number
+// of members inside a topology group. collapsed groups keep their members in
+// data('collapsedChildren') rather than in the graph, so check there too.
+function leafCount(node) {
+    if (!isTopologyGroup(node)) return 1;
+
+    var collapsed = node.data('collapsedChildren');
+    if (collapsed && collapsed.length) {
+        var n = 0;
+        collapsed.forEach(function (c) {
+            if (c.isNode && c.isNode() && !(c.isParent && c.isParent())) n++;
+        });
+        if (n) return n;
+    }
+
+    var leaves = node.descendants().filter(function (d) {
+        return !d.isParent();
+    }).length;
+    return leaves || 1;
+}
+
+// Counts have to match what "Graph Statistics" reports for the same file, i.e.
+// the relations in the sif — not the elements cytoscape happens to render.
+//
+// newt's sif topology grouping folds nodes with identical topology into
+// compounds, and the edges into them collapse with it: X->A and X->B become a
+// single X->{A,B} edge on screen. Counting cy.edges() therefore undercounts
+// (an 8-relation file was reporting 5). Each rendered edge stands for
+// leafCount(source) * leafCount(target) relations, which reproduces the sif
+// count exactly, because nodes only group when their topology is identical.
 function counts(cy) {
     if (!cy) return {nodes: 0, edges: 0};
+
+    // count the real elements: leaves, plus any compound that is a genuine SBGN
+    // container (complex, compartment) rather than a grouping artifact
     var nodes = 0;
     cy.nodes().forEach(function (n) {
-        if (!n.isParent()) nodes++;
+        if (!n.isParent() || !isTopologyGroup(n)) nodes++;
     });
-    return {nodes: nodes, edges: cy.edges().length};
+
+    var edges = 0;
+    cy.edges().forEach(function (e) {
+        edges += leafCount(e.source()) * leafCount(e.target());
+    });
+
+    return {nodes: nodes, edges: edges};
 }
 
 function plural(n, word) {
